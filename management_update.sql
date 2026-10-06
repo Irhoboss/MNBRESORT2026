@@ -1,0 +1,23 @@
+-- Run once on an existing database to enable message and room archiving.
+USE mnb_resort;
+ALTER TABLE accommodations ADD COLUMN IF NOT EXISTS is_archived TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS is_archived TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS address VARCHAR(255) NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE NULL;
+ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status ENUM('Unpaid','Partial','Paid') NOT NULL DEFAULT 'Unpaid';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1;
+ALTER TABLE accommodations ADD COLUMN IF NOT EXISTS description VARCHAR(500) NULL;
+ALTER TABLE accommodations ADD COLUMN IF NOT EXISTS amenities VARCHAR(500) NULL;
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS transaction_type ENUM('Payment','Refund') NOT NULL DEFAULT 'Payment';
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS status ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Approved';
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS proof MEDIUMTEXT NULL;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS is_hidden TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS admin_reply VARCHAR(1000) NULL;
+CREATE TABLE IF NOT EXISTS notifications(notification_id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, title VARCHAR(120) NOT NULL, message VARCHAR(500) NOT NULL, notification_type VARCHAR(40) NOT NULL DEFAULT 'announcement', reservation_id INT NULL, is_read TINYINT(1) NOT NULL DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE, FOREIGN KEY(reservation_id) REFERENCES reservations(reservation_id) ON DELETE SET NULL, INDEX(user_id,is_read,created_at));
+CREATE TABLE IF NOT EXISTS favorites(user_id INT NOT NULL, room_id INT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(user_id,room_id), FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE, FOREIGN KEY(room_id) REFERENCES accommodations(room_id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS payments(payment_id INT AUTO_INCREMENT PRIMARY KEY, reservation_id INT NOT NULL, amount DECIMAL(10,2) NOT NULL, payment_method VARCHAR(40) NOT NULL, recorded_by INT NULL, paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(reservation_id) REFERENCES reservations(reservation_id) ON DELETE CASCADE, FOREIGN KEY(recorded_by) REFERENCES users(user_id) ON DELETE SET NULL);
+CREATE TABLE IF NOT EXISTS reviews(review_id INT AUTO_INCREMENT PRIMARY KEY, reservation_id INT NOT NULL UNIQUE, guest_id INT NOT NULL, room_id INT NOT NULL, rating TINYINT NOT NULL, review_text VARCHAR(1000) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(reservation_id) REFERENCES reservations(reservation_id) ON DELETE CASCADE, FOREIGN KEY(guest_id) REFERENCES users(user_id) ON DELETE CASCADE, FOREIGN KEY(room_id) REFERENCES accommodations(room_id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS packages(package_id INT AUTO_INCREMENT PRIMARY KEY, item_type ENUM('Package','Add-on') NOT NULL DEFAULT 'Package', name VARCHAR(100) NOT NULL, description VARCHAR(500) NOT NULL, price DECIMAL(10,2) NOT NULL DEFAULT 0, is_active TINYINT(1) NOT NULL DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS resort_settings(setting_key VARCHAR(80) PRIMARY KEY, setting_value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS admin_activity(activity_id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, action VARCHAR(120) NOT NULL, details VARCHAR(500) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE SET NULL, INDEX(created_at));
+CREATE TABLE IF NOT EXISTS email_otps(otp_id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, email VARCHAR(100) NOT NULL, purpose ENUM('register','reset','password_change') NOT NULL, code_hash VARCHAR(255) NOT NULL, full_name VARCHAR(100) NULL, phone VARCHAR(20) NULL, password_hash VARCHAR(255) NULL, attempts TINYINT UNSIGNED NOT NULL DEFAULT 0, expires_at DATETIME NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX(email,purpose,created_at), INDEX(expires_at));
