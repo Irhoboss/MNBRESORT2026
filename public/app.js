@@ -15,10 +15,56 @@ const T = async f => { try { return await f() } catch (e) { toast(e.message, 1) 
 function modal(h) { const m = document.createElement('div'); m.className = 'modal'; m.onclick = e => e.target == m && m.remove(); m.innerHTML = `<div class="n pad mbox">${h}<button class="btn ghost sm" onclick="this.closest('.modal').remove()">Close</button></div>`; document.body.append(m); return m }
 const dark = () => document.documentElement.dataset.theme == 'dark';
 function theme() { const t = dark() ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.mnbTheme = t } catch (e) { } $('#tb').innerHTML = ic(dark() ? 'sun' : 'moon') }
-let AUTH_REGISTER_STEP='start',AUTH_REGISTER_EMAIL='',AUTH_RESET_EMAIL='';
-function tab(i) { mode = i; AUTH_REGISTER_STEP='start'; $('#fr').classList.toggle('hidden', !i); $('#tl').classList.toggle('on', !i); $('#tr').classList.toggle('on', !!i); $('#ab').textContent = i ? 'Create account' : 'Log in';$('#forgotBtn').classList.toggle('hidden',!!i);$('#registerResend').classList.add('hidden');$('#authOtp').classList.add('hidden');$('#authOtp').value='';$('#authOtp').disabled=false;$('#em').disabled=false;$('#pw').classList.remove('hidden');$('#fr').classList.toggle('hidden',!i) }
-async function authGo() { T(async()=>{if(!mode){await api('login',{email:$('#em').value,password:$('#pw').value});return boot()}if(AUTH_REGISTER_STEP==='start'){const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:$('#em').value,password:$('#pw').value});AUTH_REGISTER_EMAIL=r.email;AUTH_REGISTER_STEP='verify';$('#fr').classList.add('hidden');$('#pw').classList.add('hidden');$('#em').disabled=true;$('#authOtp').classList.remove('hidden');$('#registerResend').classList.remove('hidden');$('#ab').textContent='Verify email and create account';toast('Verification code sent to your email');return}await api('verifyregister',{email:AUTH_REGISTER_EMAIL,code:$('#authOtp').value});toast('Account created. Welcome to MNB Resort!');boot()}) }
-async function resendRegisterOtp(){T(async()=>{const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:AUTH_REGISTER_EMAIL,password:$('#pw').value});AUTH_REGISTER_EMAIL=r.email;toast('A new verification code was sent')})}
+let AUTH_REGISTER_STEP='start',AUTH_REGISTER_EMAIL='',AUTH_RESET_EMAIL='',AUTH_OTP_SECONDS=0,AUTH_OTP_TICK=null,AUTH_OTP_RESENDING=false;
+function syncOtpBoxes(){
+    const boxes=[...document.querySelectorAll('.otp-box')]; const value = boxes.map(b => b.value).join('');
+    const hidden = $('#authOtp'); if (hidden) hidden.value = value;
+    if (boxes.length) {
+        const next = boxes.findIndex(b => !b.value);
+        if (next >= 0) boxes[next].focus();
+    }
+}
+function stopOtpTimer(){ if(AUTH_OTP_TICK){ clearInterval(AUTH_OTP_TICK); AUTH_OTP_TICK=null } }
+function updateOtpTimer(){ const timer=$('#authOtpTimer'); const resend=$('#registerResend'); const resendLink=$('#otpResendButton'); const remaining=Math.max(0,AUTH_OTP_SECONDS); const m=String(Math.floor(remaining/60)).padStart(2,'0'); const s=String(remaining%60).padStart(2,'0'); if(timer){ timer.textContent = `${m}:${s}`; timer.classList.toggle('hidden', remaining <= 0); } if(resend){ resend.disabled = AUTH_OTP_RESENDING; resend.textContent = 'Resend verification code'; resend.classList.toggle('hidden', remaining <= 0 && AUTH_REGISTER_STEP !== 'verify'); } if(resendLink){ resendLink.disabled = AUTH_REGISTER_STEP !== 'verify' || AUTH_OTP_RESENDING; } const otpText=$('#otpExpiresText'); if (otpText) otpText.textContent = `${m}:${s}`; }
+function startOtpTimer(seconds=180){ stopOtpTimer(); AUTH_OTP_SECONDS=seconds; updateOtpTimer(); AUTH_OTP_TICK=setInterval(()=>{ AUTH_OTP_SECONDS=Math.max(0,AUTH_OTP_SECONDS-1); updateOtpTimer(); if(AUTH_OTP_SECONDS<=0){ stopOtpTimer(); } },1000); }
+function returnToAuthUi(){ AUTH_REGISTER_STEP='start'; AUTH_REGISTER_EMAIL=''; stopOtpTimer(); const auth = $('#auth'); if (auth) auth.classList.remove('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.add('hidden'); const authHint = $('#authOtpHint'); if (authHint) authHint.classList.add('hidden'); const authOtp = $('#authOtp'); if (authOtp) { authOtp.classList.add('hidden'); authOtp.value=''; } const resend = $('#registerResend'); if (resend) { resend.classList.add('hidden'); resend.disabled=false; } const timer = $('#authOtpTimer'); if (timer) timer.classList.add('hidden'); const em = $('#em'); if (em) em.disabled=false; const pw = $('#pw'); if (pw) pw.classList.remove('hidden'); const ab = $('#ab'); if (ab) ab.textContent = mode ? 'Create account' : 'Log in'; const fr = $('#fr'); if (fr) fr.classList.toggle('hidden', !mode); $('#em').value=''; $('#pw').value=''; $('#rn').value=''; $('#rph').value=''; const boxes=[...document.querySelectorAll('.otp-box')]; boxes.forEach(b => { b.value=''; }); }
+function tab(i) { mode = i; AUTH_REGISTER_STEP='start'; AUTH_REGISTER_EMAIL=''; stopOtpTimer(); const auth = $('#auth'); if (auth) auth.classList.remove('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.add('hidden'); const fr = $('#fr'); if (fr) fr.classList.toggle('hidden', !i); const tl = $('#tl'); if (tl) tl.classList.toggle('on', !i); const tr = $('#tr'); if (tr) tr.classList.toggle('on', !!i); const ab = $('#ab'); if (ab) ab.textContent = i ? 'Create account' : 'Log in'; const forgotBtn = $('#forgotBtn'); if (forgotBtn) forgotBtn.classList.toggle('hidden',!!i); const resend = $('#registerResend'); if (resend) resend.classList.add('hidden'); const authHint = $('#authOtpHint'); if (authHint) authHint.classList.add('hidden'); const authOtp = $('#authOtp'); if (authOtp) { authOtp.classList.add('hidden'); authOtp.value=''; authOtp.disabled=false; } const em = $('#em'); if (em) em.disabled=false; const pw = $('#pw'); if (pw) pw.classList.remove('hidden'); const timer = $('#authOtpTimer'); if (timer) timer.classList.add('hidden'); if (fr) fr.classList.toggle('hidden',!i); if (!i) { $('#rn').value=''; $('#rph').value=''; } }
+function showRegisterOtpStep(){ AUTH_REGISTER_STEP='verify'; const auth = $('#auth'); if (auth) auth.classList.add('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.remove('hidden'); const authHint = $('#authOtpHint'); if (authHint) { authHint.textContent='We sent a 6-digit code to ' + AUTH_REGISTER_EMAIL + '.'; authHint.classList.remove('hidden'); } const emailText = $('#otpEmailText'); if (emailText) emailText.textContent = AUTH_REGISTER_EMAIL; const authOtp = $('#authOtp'); if (authOtp) authOtp.classList.remove('hidden'); const resend = $('#registerResend'); if (resend) resend.classList.remove('hidden'); if (authOtp) authOtp.focus(); const ab = $('#ab'); if (ab) ab.textContent='Verify code'; startOtpTimer(180); syncOtpBoxes(); }
+async function authGo() { T(async()=>{if(!mode){await api('login',{email:$('#em').value,password:$('#pw').value});return boot()}if(AUTH_REGISTER_STEP==='start'){const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:$('#em').value,password:$('#pw').value});AUTH_REGISTER_EMAIL=r.email;showRegisterOtpStep();toast('Verification code sent to your email');return}syncOtpBoxes();const r=await api('verifyregister',{email:AUTH_REGISTER_EMAIL,code:$('#authOtp').value});toast('Account created. Please log in using your email and password.');returnToAuthUi(); mode = 1; tab(1); }) }
+async function resendRegisterOtp(){if(AUTH_REGISTER_STEP!=='verify'||AUTH_OTP_RESENDING)return;AUTH_OTP_RESENDING=true;updateOtpTimer();try{await T(async()=>{const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:AUTH_REGISTER_EMAIL,password:$('#pw').value});AUTH_REGISTER_EMAIL=r.email;showRegisterOtpStep();toast('A new verification code was sent')})}finally{AUTH_OTP_RESENDING=false;updateOtpTimer()}}
+
+function bindOtpInputEvents(){
+    const boxes=[...document.querySelectorAll('.otp-box')];
+    boxes.forEach((box,index)=>{
+        box.addEventListener('input', (e)=>{
+            const value = e.target.value.replace(/\D/g,'').slice(-1);
+            e.target.value = value;
+            if (value && index < boxes.length - 1) boxes[index + 1].focus();
+            syncOtpBoxes();
+        });
+        box.addEventListener('keydown', (e)=>{
+            if (e.key === 'Backspace' && !box.value && index > 0) {
+                boxes[index - 1].focus();
+                boxes[index - 1].value = '';
+                syncOtpBoxes();
+            }
+            if (e.key === 'ArrowLeft' && index > 0) boxes[index - 1].focus();
+            if (e.key === 'ArrowRight' && index < boxes.length - 1) boxes[index + 1].focus();
+            if (e.key === 'Enter') authGo();
+        });
+        box.addEventListener('paste', (e)=>{
+            const text=(e.clipboardData||window.clipboardData).getData('text');
+            const digits = text.replace(/\D/g,'').slice(0,6);
+            if (!digits) return;
+            e.preventDefault();
+            digits.split('').forEach((d, i) => { if (boxes[i]) boxes[i].value = d; });
+            boxes[Math.min(digits.length, boxes.length - 1)].focus();
+            syncOtpBoxes();
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', bindOtpInputEvents);
 function forgotPassword(){const m=modal('<h3>Reset password</h3><p>Enter the email address on your account.</p><input id="resetEmail" type="email" placeholder="Email" value="'+esc($('#em').value)+'"><button class="btn" onclick="requestResetCode()">Send reset code</button>');m.querySelector('.mbox').style.maxWidth='440px'}
 async function requestResetCode(){await T(async()=>{const email=$('#resetEmail').value.trim();await api('resetotp',{email});AUTH_RESET_EMAIL=email;const box=document.querySelector('.modal .mbox');box.innerHTML='<h3>Check your email</h3><p>If this email is registered, a password reset code has been sent. The code expires in 10 minutes.</p><input id="resetCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code"><input id="resetNewPassword" type="password" placeholder="New password (6+ characters)"><button class="btn" onclick="finishResetPassword()">Update password</button><button class="btn ghost sm" onclick="this.closest(\'.modal\').remove()">Close</button>'})}
 async function finishResetPassword(){await T(async()=>{await api('resetpassword',{email:AUTH_RESET_EMAIL,code:$('#resetCode').value,password:$('#resetNewPassword').value});document.querySelector('.modal')?.remove();toast('Password changed. You can log in now.')})}

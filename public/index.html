@@ -12,18 +12,42 @@
 <body>
     <div id="auth" class="center hidden">
         <div class="n pad authbox">
-            <div class="logo">MNB<span>Resort</span></div>
-            <p class="mut">Papaya, Nasugbu, Batangas</p>
-            <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
+            <div class="auth-main">
+                <div class="logo">MNB<span>Resort</span></div>
+                <p class="mut">Papaya, Nasugbu, Batangas</p>
+                <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
+                </div>
+                <div id="fr" class="hidden"><input id="rn" placeholder="Full name"><input id="rph" placeholder="Phone">
+                </div>
+                <input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password"
+                    onkeydown="event.key=='Enter'&&authGo()">
+                <p id="authOtpHint" class="mut hidden">We sent a 6-digit code to your email.</p>
+                <div class="row" style="justify-content:space-between;align-items:center;gap:8px;">
+                    <span id="authOtpTimer" class="badge hidden">01:00</span>
+                    <button class="btn ghost hidden" onclick="resendRegisterOtp()" id="registerResend">Resend verification code</button>
+                </div>
+                <input id="authOtp" class="hidden" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit email verification code" onkeydown="event.key=='Enter'&&authGo()">
+                <button class="btn" onclick="authGo()" id="ab">Log in</button>
+                <button class="btn ghost" onclick="forgotPassword()" id="forgotBtn">Forgot password?</button>
             </div>
-            <div id="fr" class="hidden"><input id="rn" placeholder="Full name"><input id="rph" placeholder="Phone">
+
+            <div id="otpPanel" class="otp-panel hidden" aria-live="polite">
+                <div class="otp-icon"> </div>
+                <h2>Check your email</h2>
+                <p>We sent a 6-digit verification code to <strong id="otpEmailText">your@email.com</strong></p>
+                <div class="otp-digits" aria-label="One-time password input">
+                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 1" />
+                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 2" />
+                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 3" />
+                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 4" />
+                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 5" />
+                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 6" />
+                </div>
+                <div class="otp-timer">Code expires in <span id="otpExpiresText">09:47</span></div>
+                <button class="btn otp-submit" onclick="authGo()">VERIFY ACCOUNT</button>
+                <div class="otp-resend">Didn't get the code? <a href="#" onclick="event.preventDefault(); resendRegisterOtp();">Resend</a></div>
+                <a href="#" class="otp-back" onclick="event.preventDefault(); returnToAuthUi();">← Back to Create Account</a>
             </div>
-            <input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password"
-                onkeydown="event.key=='Enter'&&authGo()">
-            <input id="authOtp" class="hidden" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit email verification code" onkeydown="event.key=='Enter'&&authGo()">
-            <button class="btn" onclick="authGo()" id="ab">Log in</button>
-            <button class="btn ghost hidden" onclick="resendRegisterOtp()" id="registerResend">Resend verification code</button>
-            <button class="btn ghost" onclick="forgotPassword()" id="forgotBtn">Forgot password?</button>
         </div>
     </div>
     <div id="app" class="wrap hidden">
