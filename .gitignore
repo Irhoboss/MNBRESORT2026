@@ -1,0 +1,11 @@
+/vendor/
+/vendor.partial/
+/composer.phar
+/.env
+/.env.*
+!.env.example
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*.log
+/bootstrap/cache/*.php
