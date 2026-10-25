@@ -6,29 +6,34 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MNB Resort</title>
     <script>try { document.documentElement.dataset.theme = localStorage.mnbTheme || 'light' } catch (e) { }</script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div id="auth" class="center hidden">
-        <div class="n pad authbox">
+    <div id="auth" class="center auth-shell hidden">
+        <div class="authbox row g-0 container-fluid shadow-lg">
+            <section class="auth-visual col-lg-7">
+                <div class="auth-brand"><span class="auth-brand-mark">M</span> MNB <span>Resort</span></div>
+                <div class="auth-story">
+                    <span class="auth-eyebrow">PAPAYA · NASUGBU · BATANGAS</span>
+                    <h1>Your tropical escape<br>starts here.</h1>
+                    <p>Slow down, breathe in the sea air, and make room for a better kind of getaway.</p>
+                    <small>Made for your next memorable stay</small>
+                </div>
+            </section>
+            <section class="auth-content col-lg-5">
             <div class="auth-main">
-                <div class="logo">MNB<span>Resort</span></div>
-                <p class="mut">Papaya, Nasugbu, Batangas</p>
+                <div class="auth-heading"><span class="auth-kicker">WELCOME TO MNB RESORT</span><h2 id="authTitle">Welcome back</h2><p class="mut" id="authSubtitle">Log in to plan your next escape.</p></div>
                 <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
                 </div>
-                <div id="fr" class="hidden"><input id="rn" placeholder="Full name"><input id="rph" placeholder="Phone">
+                <div id="fr" class="hidden"><input id="rn" autocomplete="name" placeholder="Full name"><input id="rph" autocomplete="tel" placeholder="Phone">
                 </div>
-                <input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password"
+                <input id="em" type="email" autocomplete="email" placeholder="Email"><input id="pw" type="password" autocomplete="current-password" placeholder="Password"
                     onkeydown="event.key=='Enter'&&authGo()">
-                <p id="authOtpHint" class="mut hidden">We sent a 6-digit code to your email.</p>
-                <div class="row" style="justify-content:space-between;align-items:center;gap:8px;">
-                    <span id="authOtpTimer" class="badge hidden">01:00</span>
-                    <button class="btn ghost hidden" onclick="resendRegisterOtp()" id="registerResend">Resend verification code</button>
-                </div>
                 <input id="authOtp" class="hidden" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit email verification code" onkeydown="event.key=='Enter'&&authGo()">
-                <button class="btn" onclick="authGo()" id="ab">Log in</button>
-                <button class="btn ghost" onclick="forgotPassword()" id="forgotBtn">Forgot password?</button>
+                <button type="button" class="btn" onclick="authGo()" id="ab">Log in</button>
+                <button type="button" class="btn ghost" onclick="forgotPassword()" id="forgotBtn">Forgot password?</button>
             </div>
 
             <div id="otpPanel" class="otp-panel hidden" aria-live="polite">
@@ -44,10 +49,13 @@
                     <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 6" />
                 </div>
                 <div class="otp-timer">Code expires in <span id="otpExpiresText">09:47</span></div>
-                <button class="btn otp-submit" onclick="authGo()">VERIFY ACCOUNT</button>
-                <div class="otp-resend">Didn't get the code? <button type="button" class="otp-resend-button" id="otpResendButton" disabled onclick="resendRegisterOtp()">Resend</button></div>
+                <div class="otp-actions">
+                    <button type="button" class="btn otp-submit" onclick="authGo()">VERIFY ACCOUNT</button>
+                    <button type="button" class="btn otp-resend-button" id="otpResendButton" disabled onclick="resendRegisterOtp()">RESEND CODE</button>
+                </div>
                 <a href="#" class="otp-back" onclick="event.preventDefault(); returnToAuthUi();">← Back to Create Account</a>
             </div>
+            </section>
         </div>
     </div>
     <div id="app" class="wrap hidden">
@@ -63,8 +71,8 @@
             <main id="main" class="g"></main>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="app.js"></script>
 </body>
 

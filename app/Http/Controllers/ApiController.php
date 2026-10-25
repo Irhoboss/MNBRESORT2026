@@ -59,7 +59,7 @@ case 'saveroom':
  if($id)q("UPDATE accommodations SET room_name=?,category=?,description=?,amenities=?,capacity=?,rate_per_night=?,is_available=? WHERE room_id=?",[...$v,$id]);
  else{q("INSERT INTO accommodations(room_name,category,description,amenities,capacity,rate_per_night,is_available) VALUES(?,?,?,?,?,?,?)",$v);$id=$pdo->lastInsertId();}
  audit($id?'Room updated':'Room added',"Room #$id · ".$v[0]);
- if(!empty($in['photo'])){$photoError=savePhoto($id,$in['photo']);if($photoError)out(['error'=>$photoError],422);}
+ if(array_key_exists('photos',$in)||!empty($in['photo'])){$photoError=savePhoto($id,$in['photos']??$in['photo']);if($photoError)out(['error'=>$photoError],422);}
  out(['ok'=>1]);
 case 'archiveroom':
  need('Staff','Admin');$id=(int)($in['id']??0);$arch=empty($in['arch'])?0:1;if(!q("SELECT 1 FROM accommodations WHERE room_id=?",[$id])->fetch())out(['error'=>'Room not found'],404);q("UPDATE accommodations SET is_archived=? WHERE room_id=?",[$arch,$id]);audit($arch?'Room archived':'Room restored',"Room #$id");out(['ok'=>1]);
@@ -85,14 +85,15 @@ case 'list':
  if(!empty($_GET['act']))$w[]="r.status IN ".ACTIVE;
  if(!empty($_GET['s'])){$w[]='(u.full_name LIKE ? OR a.room_name LIKE ? OR r.reservation_id=?)';$l='%'.$_GET['s'].'%';array_push($p,$l,$l,(int)$_GET['s']);}
  if(!empty($_GET['from'])&&!empty($_GET['to'])){$w[]='r.check_in_date<=? AND r.check_out_date>?';array_push($p,$_GET['to'],$_GET['from']);}
- out(q("SELECT r.*,u.full_name,u.phone,a.room_name,a.rate_per_night,DATEDIFF(r.check_out_date,r.check_in_date) nights,(SELECT COALESCE(SUM(CASE WHEN p.transaction_type='Payment' THEN p.amount ELSE -p.amount END),0) FROM payments p WHERE p.reservation_id=r.reservation_id AND p.status='Approved') amount_paid FROM reservations r JOIN users u ON u.user_id=r.guest_id JOIN accommodations a ON a.room_id=r.room_id WHERE ".implode(' AND ',$w)." ORDER BY r.created_at DESC LIMIT 300",$p)->fetchAll());
+ $rows=q("SELECT r.*,u.full_name,u.phone,a.room_name,a.rate_per_night,DATEDIFF(r.check_out_date,r.check_in_date) nights,(SELECT COALESCE(SUM(CASE WHEN p.transaction_type='Payment' THEN p.amount ELSE -p.amount END),0) FROM payments p WHERE p.reservation_id=r.reservation_id AND p.status='Approved') amount_paid FROM reservations r JOIN users u ON u.user_id=r.guest_id JOIN accommodations a ON a.room_id=r.room_id WHERE ".implode(' AND ',$w)." ORDER BY r.created_at DESC LIMIT 300",$p)->fetchAll();foreach($rows as &$row)$row['checkout_overdue']=$row['status']==='Checked-In'&&checkoutOverdue($row['check_out_date']);unset($row);out($rows);
 case 'setstatus':
  need('Staff','Admin');$id=(int)$in['id'];$st=$in['st']??'';
  $ok=['Confirmed'=>['Pending'],'Cancelled'=>['Pending','Confirmed'],'Checked-In'=>['Confirmed'],'Completed'=>['Checked-In']];
- $r=q("SELECT status,guest_id,payment_status FROM reservations WHERE reservation_id=?",[$id])->fetch();
+ $r=q("SELECT status,guest_id,payment_status,qr_code_hash FROM reservations WHERE reservation_id=?",[$id])->fetch();
  if(!$r||!isset($ok[$st])||!in_array($r['status'],$ok[$st]))out(['error'=>'Action not allowed for current status'],422);
  if($st==='Completed'){$tot=(float)q("SELECT DATEDIFF(check_out_date,check_in_date)*a.rate_per_night FROM reservations r JOIN accommodations a ON a.room_id=r.room_id WHERE reservation_id=?",[$id])->fetchColumn();$paid=(float)q("SELECT COALESCE(SUM(CASE WHEN transaction_type='Payment' THEN amount ELSE -amount END),0) FROM payments WHERE reservation_id=? AND status='Approved'",[$id])->fetchColumn();if($paid+0.005<$tot)out(['error'=>'Record the full payment before checking out.'],422);}
- if($st=='Confirmed'||$st=='Checked-In')q("UPDATE reservations SET status=?,qr_code_hash=? WHERE reservation_id=?",[$st,bin2hex(random_bytes(32)),$id]);
+ if($st=='Confirmed')q("UPDATE reservations SET status=?,qr_code_hash=COALESCE(qr_code_hash,?) WHERE reservation_id=?",[$st,bin2hex(random_bytes(32)),$id]);
+ elseif($st=='Checked-In')q("UPDATE reservations SET status=?,qr_code_hash=COALESCE(qr_code_hash,?) WHERE reservation_id=?",[$st,bin2hex(random_bytes(32)),$id]);
  else q("UPDATE reservations SET status=?,qr_code_hash=NULL WHERE reservation_id=?",[$st,$id]);
  if($st==='Completed')q("UPDATE reservations SET payment_status='Paid' WHERE reservation_id=?",[$id]);
  audit('Booking '.$st,"Booking #$id");notify($r['guest_id'],'Booking '.$st,"Your booking #$id is now $st.",'booking',$id);
@@ -100,16 +101,18 @@ case 'setstatus':
 case 'scan':
  need('Staff','Admin');
  $code=clean($in['code']??'',255);
- $r=q("SELECT r.*,u.full_name,u.phone,a.room_name FROM reservations r JOIN users u ON u.user_id=r.guest_id JOIN accommodations a ON a.room_id=r.room_id WHERE qr_code_hash=?",[$code])->fetch();
+ $r=q("SELECT r.*,u.full_name,u.phone,a.room_name,DATEDIFF(r.check_out_date,r.check_in_date)*a.rate_per_night total,(SELECT COALESCE(SUM(CASE WHEN p.transaction_type='Payment' THEN p.amount ELSE -p.amount END),0) FROM payments p WHERE p.reservation_id=r.reservation_id AND p.status='Approved') amount_paid FROM reservations r JOIN users u ON u.user_id=r.guest_id JOIN accommodations a ON a.room_id=r.room_id WHERE qr_code_hash=?",[$code])->fetch();
  if(!$r||!in_array($r['status'],['Confirmed','Checked-In'],true))out(['error'=>'Invalid, expired, or already used QR code'],404);
  $r['next_action']=$r['status']=='Confirmed'?'Check-In':'Check-Out';
+ $r['remaining_balance']=max(0,(float)$r['total']-(float)$r['amount_paid']);$r['checkout_overdue']=$r['status']==='Checked-In'&&checkoutOverdue($r['check_out_date']);
+ $checkoutTime=q("SELECT setting_value FROM resort_settings WHERE setting_key='check_out_time'")->fetchColumn()?:'12:00';$r['checkout_due_at']=$r['check_out_date'].' '.$checkoutTime;
  out($r);
 case 'checkqr':
  need('Staff','Admin');$code=clean($in['code']??'',255);$pdo->beginTransaction();
  $r=q("SELECT r.*,u.full_name,u.phone,a.room_name,DATEDIFF(r.check_out_date,r.check_in_date)*a.rate_per_night total FROM reservations r JOIN users u ON u.user_id=r.guest_id JOIN accommodations a ON a.room_id=r.room_id WHERE qr_code_hash=? FOR UPDATE",[$code])->fetch();
  if(!$r||!in_array($r['status'],['Confirmed','Checked-In'],true)){$pdo->rollBack();out(['error'=>'This QR was already used or has expired.'],409);}
- if($r['status']==='Checked-In'){$paid=(float)q("SELECT COALESCE(SUM(CASE WHEN transaction_type='Payment' THEN amount ELSE -amount END),0) FROM payments WHERE reservation_id=? AND status='Approved'",[$r['reservation_id']])->fetchColumn();if($paid+0.005<(float)$r['total']){$pdo->rollBack();out(['error'=>'Checkout is blocked. Collect the remaining balance of '.number_format((float)$r['total']-$paid,2).' first.'],422);}}
- $next=$r['status']=='Confirmed'?'Checked-In':'Completed';$nextCode=$next=='Checked-In'?bin2hex(random_bytes(32)):null;
+ if($r['status']==='Checked-In'){$paid=(float)q("SELECT COALESCE(SUM(CASE WHEN transaction_type='Payment' THEN amount ELSE -amount END),0) FROM payments WHERE reservation_id=? AND status='Approved'",[$r['reservation_id']])->fetchColumn();if($paid+0.005<(float)$r['total']||$r['payment_status']!=='Paid'){$pdo->rollBack();out(['error'=>'Checkout is blocked until the full balance of '.number_format(max(0,(float)$r['total']-$paid),2).' is paid and approved.'],422);}}
+ $next=$r['status']=='Confirmed'?'Checked-In':'Completed';$nextCode=$next=='Checked-In'?$code:null;
  q("UPDATE reservations SET status=?,qr_code_hash=?,payment_status=IF(?='Completed','Paid',payment_status) WHERE reservation_id=? AND qr_code_hash=?",[$next,$nextCode,$next,$r['reservation_id'],$code]);$r['status']=$next;$r['qr_code_hash']=$nextCode;if($next==='Completed')$r['payment_status']='Paid';$pdo->commit();notify($r['guest_id'],'Booking '.$next,"Your booking #{$r['reservation_id']} is now $next.",'booking',$r['reservation_id']);out($r);
 case 'stats':
  need('Staff','Admin');$t=date('Y-m-d');
