@@ -9,13 +9,29 @@ const NAV = {
     Staff: [['home', 'home', 'Dashboard'], ['res', 'list', 'Reservations'], ['scan', 'scan', 'Scan QR'], ['rooms', 'rooms', 'Inventory'], ['availability', 'clock', 'Availability'], ['msg', 'chat', 'Messages'], ['rep', 'chart', 'Reports'], ['notifications', 'bell', 'Notifications'], ['profile', 'user', 'Profile']]
 };
 NAV.Admin = [['home', 'home', 'Dashboard'], ['group', '', 'Bookings'], ['res', 'list', 'All bookings'], ['scan', 'scan', 'Scan QR'], ['group', '', 'Resort inventory'], ['rooms', 'rooms', 'Inventory'], ['availability', 'clock', 'Availability'], ['group', '', 'Management'], ['users', 'users', 'Users / customers'], ['paymentsAdmin', 'card', 'Payment transactions'], ['paymentsAdmin', 'out', 'Refunds', { filter: 'refunds' }], ['packages', 'ticket', 'Packages / add-ons'], ['reviewsAdmin', 'star', 'Reviews & ratings'], ['msg', 'chat', 'Messages'], ['notifications', 'bell', 'Notifications'], ['rep', 'chart', 'Reports'], ['settings', 'info', 'Settings'], ['activity', 'list', 'Activity log'], ['profile', 'user', 'Profile'], ['logout', 'out', 'Logout']];
-async function api(a, d, qs = '') { const r = await fetch('api?a=' + a + qs, d ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) } : {}); const raw = await r.text(); let j; try { j = JSON.parse(raw) } catch (e) { console.error('Non-JSON API response:', raw); throw new Error('The server returned an invalid response. Check the PHP error log.') } if (j.error) throw new Error(j.error); if (!r.ok) throw new Error('Request failed (' + r.status + ')'); return j }
+async function api(a, d, qs = '') { const token = document.querySelector('meta[name="csrf-token"]')?.content; const r = await fetch('api?a=' + a + qs, d ? { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token || '' }, body: JSON.stringify(d) } : {}); const raw = await r.text(); let j; try { j = JSON.parse(raw) } catch (e) { console.error('Non-JSON API response:', raw); throw new Error('The server returned an invalid response. Check the PHP error log.') } if (j.error) throw new Error(j.error); if (!r.ok) throw new Error('Request failed (' + r.status + ')'); return j }
+
+function saveCookieChoice() { try { localStorage.setItem('mnbCookieChoice', 'essential') } catch (e) {} const banner = document.querySelector('#cookie-banner'); if (banner) banner.hidden = true }
+document.addEventListener('DOMContentLoaded', () => { const banner = document.querySelector('#cookie-banner'); let choice = ''; try { choice = localStorage.getItem('mnbCookieChoice') || '' } catch (e) {} if (banner && !choice) banner.hidden = false; document.querySelector('#cookie-essential')?.addEventListener('click', saveCookieChoice); document.querySelector('#cookie-settings')?.addEventListener('click', () => { if (banner) { banner.hidden = false; document.querySelector('#cookie-essential')?.focus() } }) });
 function toast(m, bad) { const t = document.createElement('div'); t.className = 'toast' + (bad ? ' bad' : ''); t.textContent = m; document.body.append(t); setTimeout(() => t.remove(), 3200) }
 const T = async f => { try { return await f() } catch (e) { toast(e.message, 1) } };
 function modal(h) { const m = document.createElement('div'); m.className = 'modal' + (/Confirm check-(in|out)/i.test(h) ? ' checkin-modal' : ''); m.onclick = e => e.target == m && m.remove(); m.innerHTML = `<div class="n pad mbox">${h}<button class="btn ghost sm" onclick="this.closest('.modal').remove()">Close</button></div>`; document.body.append(m); return m }
 const dark = () => document.documentElement.dataset.theme == 'dark';
 function theme() { const t = dark() ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.mnbTheme = t } catch (e) { } $('#tb').innerHTML = ic(dark() ? 'sun' : 'moon') }
 let AUTH_REGISTER_STEP='start',AUTH_REGISTER_EMAIL='',AUTH_RESET_EMAIL='',AUTH_OTP_SECONDS=0,AUTH_OTP_TICK=null,AUTH_OTP_RESENDING=false;
+function clearAuthError(){ const error=$('#authError'); if(error){error.textContent='';error.classList.add('hidden')} }
+function showAuthError(message){ const error=$('#authError'); if(error){error.textContent=message||'Unable to continue. Please check your details and try again.';error.classList.remove('hidden')} }
+function togglePasswordVisibility(){
+    const password=$('#pw'),button=$('#pwToggle');
+    if(!password||!button)return;
+    const visible=password.type==='password';
+    password.type=visible?'text':'password';
+    button.setAttribute('aria-label',visible?'Hide password':'Show password');
+    button.setAttribute('aria-pressed',String(visible));
+    button.innerHTML=visible
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a15.7 15.7 0 0 1-3.1 3.8M6.2 6.2C3.5 8.1 2 12 2 12s3.6 7 10 7a10.7 10.7 0 0 0 3-.4"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+}
 function syncOtpBoxes(){
     const boxes=[...document.querySelectorAll('.otp-box')]; const value = boxes.map(b => b.value).join('');
     const hidden = $('#authOtp'); if (hidden) hidden.value = value;
@@ -28,9 +44,40 @@ function stopOtpTimer(){ if(AUTH_OTP_TICK){ clearInterval(AUTH_OTP_TICK); AUTH_O
 function updateOtpTimer(){ const timer=$('#authOtpTimer'); const resend=$('#registerResend'); const resendLink=$('#otpResendButton'); const remaining=Math.max(0,AUTH_OTP_SECONDS); const m=String(Math.floor(remaining/60)).padStart(2,'0'); const s=String(remaining%60).padStart(2,'0'); if(timer){ timer.textContent = `${m}:${s}`; timer.classList.toggle('hidden', remaining <= 0); } if(resend){ resend.disabled = AUTH_OTP_RESENDING; resend.textContent = 'Resend verification code'; resend.classList.toggle('hidden', remaining <= 0 && AUTH_REGISTER_STEP !== 'verify'); } if(resendLink){ resendLink.disabled = AUTH_REGISTER_STEP !== 'verify' || AUTH_OTP_RESENDING; } const otpText=$('#otpExpiresText'); if (otpText) otpText.textContent = `${m}:${s}`; }
 function startOtpTimer(seconds=180){ stopOtpTimer(); AUTH_OTP_SECONDS=seconds; updateOtpTimer(); AUTH_OTP_TICK=setInterval(()=>{ AUTH_OTP_SECONDS=Math.max(0,AUTH_OTP_SECONDS-1); updateOtpTimer(); if(AUTH_OTP_SECONDS<=0){ stopOtpTimer(); } },1000); }
 function returnToAuthUi(){ AUTH_REGISTER_STEP='start'; AUTH_REGISTER_EMAIL=''; stopOtpTimer(); const auth = $('#auth'); if (auth) auth.classList.remove('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.add('hidden'); const authHint = $('#authOtpHint'); if (authHint) authHint.classList.add('hidden'); const authOtp = $('#authOtp'); if (authOtp) { authOtp.classList.add('hidden'); authOtp.value=''; } const resend = $('#registerResend'); if (resend) { resend.classList.add('hidden'); resend.disabled=false; } const timer = $('#authOtpTimer'); if (timer) timer.classList.add('hidden'); const em = $('#em'); if (em) em.disabled=false; const pw = $('#pw'); if (pw) pw.classList.remove('hidden'); const ab = $('#ab'); if (ab) ab.textContent = mode ? 'Create account' : 'Log in'; const fr = $('#fr'); if (fr) fr.classList.toggle('hidden', !mode); $('#em').value=''; $('#pw').value=''; $('#rn').value=''; $('#rph').value=''; const boxes=[...document.querySelectorAll('.otp-box')]; boxes.forEach(b => { b.value=''; }); }
-function tab(i) { mode = i; const title=$('#authTitle'), subtitle=$('#authSubtitle'); if(title) title.textContent=i?'Create your account':'Welcome back'; if(subtitle) subtitle.textContent=i?'Join us and start planning your stay.':'Log in to plan your next escape.'; AUTH_REGISTER_STEP='start'; AUTH_REGISTER_EMAIL=''; stopOtpTimer(); const auth = $('#auth'); if (auth) auth.classList.remove('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.add('hidden'); const fr = $('#fr'); if (fr) fr.classList.toggle('hidden', !i); const tl = $('#tl'); if (tl) tl.classList.toggle('on', !i); const tr = $('#tr'); if (tr) tr.classList.toggle('on', !!i); const ab = $('#ab'); if (ab) ab.textContent = i ? 'Create account' : 'Log in'; const forgotBtn = $('#forgotBtn'); if (forgotBtn) forgotBtn.classList.toggle('hidden',!!i); const resend = $('#registerResend'); if (resend) resend.classList.add('hidden'); const authHint = $('#authOtpHint'); if (authHint) authHint.classList.add('hidden'); const authOtp = $('#authOtp'); if (authOtp) { authOtp.classList.add('hidden'); authOtp.value=''; authOtp.disabled=false; } const em = $('#em'); if (em) em.disabled=false; const pw = $('#pw'); if (pw) pw.classList.remove('hidden'); const timer = $('#authOtpTimer'); if (timer) timer.classList.add('hidden'); if (fr) fr.classList.toggle('hidden',!i); if (!i) { $('#rn').value=''; $('#rph').value=''; } }
+function tab(i) { clearAuthError(); mode = i; const title=$('#authTitle'), subtitle=$('#authSubtitle'); if(title) title.textContent=i?'Create your account':'Welcome back'; if(subtitle) subtitle.textContent=i?'Join us and start planning your stay.':'Log in to plan your next escape.'; AUTH_REGISTER_STEP='start'; AUTH_REGISTER_EMAIL=''; stopOtpTimer(); const auth = $('#auth'); if (auth) auth.classList.remove('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.add('hidden'); const fr = $('#fr'); if (fr) fr.classList.toggle('hidden', !i); const tl = $('#tl'); if (tl) tl.classList.toggle('on', !i); const tr = $('#tr'); if (tr) tr.classList.toggle('on', !!i); const ab = $('#ab'); if (ab) ab.textContent = i ? 'Create account' : 'Log in'; const forgotBtn = $('#forgotBtn'); if (forgotBtn) forgotBtn.classList.toggle('hidden',!!i); const resend = $('#registerResend'); if (resend) resend.classList.add('hidden'); const authHint = $('#authOtpHint'); if (authHint) authHint.classList.add('hidden'); const authOtp = $('#authOtp'); if (authOtp) { authOtp.classList.add('hidden'); authOtp.value=''; authOtp.disabled=false; } const em = $('#em'); if (em) em.disabled=false; const pw = $('#pw'); if (pw) pw.classList.remove('hidden'); const timer = $('#authOtpTimer'); if (timer) timer.classList.add('hidden'); if (fr) fr.classList.toggle('hidden',!i); if (!i) { $('#rn').value=''; $('#rph').value=''; } }
 function showRegisterOtpStep(){ AUTH_REGISTER_STEP='verify'; const auth = $('#auth'); if (auth) auth.classList.add('otp-mode'); const otpPanel = $('#otpPanel'); if (otpPanel) otpPanel.classList.remove('hidden'); const authHint = $('#authOtpHint'); if (authHint) { authHint.textContent='We sent a 6-digit code to ' + AUTH_REGISTER_EMAIL + '.'; authHint.classList.remove('hidden'); } const emailText = $('#otpEmailText'); if (emailText) emailText.textContent = AUTH_REGISTER_EMAIL; const authOtp = $('#authOtp'); if (authOtp) authOtp.classList.remove('hidden'); const resend = $('#registerResend'); if (resend) resend.classList.remove('hidden'); if (authOtp) authOtp.focus(); const ab = $('#ab'); if (ab) ab.textContent='Verify code'; startOtpTimer(180); syncOtpBoxes(); }
-async function authGo() { T(async()=>{if(!mode){await api('login',{email:$('#em').value,password:$('#pw').value});return boot()}if(AUTH_REGISTER_STEP==='start'){const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:$('#em').value,password:$('#pw').value});AUTH_REGISTER_EMAIL=r.email;showRegisterOtpStep();toast('Verification code sent to your email');return}syncOtpBoxes();const r=await api('verifyregister',{email:AUTH_REGISTER_EMAIL,code:$('#authOtp').value});toast('Account created. Please log in using your email and password.');returnToAuthUi(); mode = 1; tab(1); }) }
+async function authGo() {
+    const button=$('#ab');
+    clearAuthError();
+    if(button)button.disabled=true;
+    try {
+        if(!mode){
+            await api('login',{email:$('#em').value,password:$('#pw').value});
+            return await boot();
+        }
+        if(AUTH_REGISTER_STEP==='start'){
+            if(!$('#guardianConsent').checked){
+                showAuthError('Please confirm the age and policy acknowledgement to continue.');
+                return;
+            }
+            const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:$('#em').value,password:$('#pw').value,guardian_confirmed:true});
+            AUTH_REGISTER_EMAIL=r.email;
+            showRegisterOtpStep();
+            toast('Verification code sent to your email');
+            return;
+        }
+        syncOtpBoxes();
+        await api('verifyregister',{email:AUTH_REGISTER_EMAIL,code:$('#authOtp').value});
+        toast('Account created. Please log in using your email and password.');
+        returnToAuthUi();
+        mode = 1;
+        tab(1);
+    } catch (error) {
+        showAuthError(error.message);
+    } finally {
+        if(button)button.disabled=false;
+    }
+}
 async function resendRegisterOtp(){if(AUTH_REGISTER_STEP!=='verify'||AUTH_OTP_RESENDING)return;AUTH_OTP_RESENDING=true;updateOtpTimer();try{await T(async()=>{const r=await api('register',{name:$('#rn').value,phone:$('#rph').value,email:AUTH_REGISTER_EMAIL,password:$('#pw').value});AUTH_REGISTER_EMAIL=r.email;showRegisterOtpStep();toast('A new verification code was sent')})}finally{AUTH_OTP_RESENDING=false;updateOtpTimer()}}
 
 function bindOtpInputEvents(){
@@ -329,4 +376,3 @@ async function requestPasswordOtp(){await T(async()=>{const r=await api('passwor
 savePw=async()=>{if($('#newPassword').value.length<6)return toast('New password must be at least 6 characters.',1);if($('#newPassword').value!==$('#confirmPassword').value)return toast('Passwords do not match.',1);await T(async()=>{await api('changepassword',{code:$('#passwordOtp').value,password:$('#newPassword').value});toast('Password changed successfully.');go('profile')})};
 V.logout = () => logout();
 boot();
-

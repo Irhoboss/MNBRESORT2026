@@ -17,7 +17,7 @@ final class ApiController
         $pdo = null;
         $MAIL = config('mnb.mail');
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
+            session_set_cookie_params(['httponly' => true, 'secure' => $request->isSecure(), 'samesite' => 'Lax']);
             session_start();
         }
         date_default_timezone_set('Asia/Manila');
@@ -28,6 +28,7 @@ try{
  switch($a){
 case 'register':
  $n=clean($in['name']??'');$e=strtolower(clean($in['email']??''));$ph=clean($in['phone']??'',20);$pw=(string)($in['password']??'');
+ if(empty($in['guardian_confirmed']))out(['error'=>'Age and policy acknowledgement is required'],422);
  if(!$n||!filter_var($e,FILTER_VALIDATE_EMAIL)||strlen($pw)<6)out(['error'=>'Complete all fields (password min. 6 characters)'],422);
  if(q("SELECT 1 FROM users WHERE email=?",[$e])->fetch())out(['error'=>'Email already registered'],422);
  $error=issueOtp($e,'register',null,$n,$ph,password_hash($pw,PASSWORD_DEFAULT));if($error)out(['error'=>$error],503);out(['otp_sent'=>1,'email'=>$e]);

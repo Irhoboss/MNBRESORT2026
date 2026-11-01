@@ -8,6 +8,7 @@
     <script>try { document.documentElement.dataset.theme = localStorage.mnbTheme || 'light' } catch (e) { }</script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
@@ -27,10 +28,18 @@
                 <div class="auth-heading"><span class="auth-kicker">WELCOME TO MNB RESORT</span><h2 id="authTitle">Welcome back</h2><p class="mut" id="authSubtitle">Log in to plan your next escape.</p></div>
                 <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
                 </div>
-                <div id="fr" class="hidden"><input id="rn" autocomplete="name" placeholder="Full name"><input id="rph" autocomplete="tel" placeholder="Phone">
+                <div id="authError" class="auth-error hidden" role="alert" aria-live="assertive"></div>
+                <div id="fr" class="hidden"><input id="rn" autocomplete="name" placeholder="Full name" oninput="clearAuthError()"><input id="rph" autocomplete="tel" placeholder="Phone" oninput="clearAuthError()">
                 </div>
-                <input id="em" type="email" autocomplete="email" placeholder="Email"><input id="pw" type="password" autocomplete="current-password" placeholder="Password"
-                    onkeydown="event.key=='Enter'&&authGo()">
+                <input id="em" type="email" autocomplete="email" placeholder="Email" oninput="clearAuthError()">
+                <div class="auth-password-control">
+                    <input id="pw" type="password" autocomplete="current-password" placeholder="Password" oninput="clearAuthError()"
+                        onkeydown="event.key=='Enter'&&authGo()">
+                    <button id="pwToggle" class="auth-password-toggle" type="button" aria-label="Show password" aria-controls="pw" aria-pressed="false" onclick="togglePasswordVisibility()">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+                <label class="registration-consent"><input id="guardianConsent" type="checkbox" onchange="clearAuthError()"><span>I am 18 or older, or a parent or legal guardian registering for a minor. I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener">Terms</a> and acknowledge the <a href="{{ route('privacy') }}" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
                 <input id="authOtp" class="hidden" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit email verification code" onkeydown="event.key=='Enter'&&authGo()">
                 <button type="button" class="btn" onclick="authGo()" id="ab">Log in</button>
                 <button type="button" class="btn ghost" onclick="forgotPassword()" id="forgotBtn">Forgot password?</button>
@@ -71,6 +80,39 @@
             <main id="main" class="g"></main>
         </div>
     </div>
+    <footer class="site-legal">
+        <div class="site-legal-inner">
+            <div class="site-legal-intro">
+                <div class="site-legal-brand"><span class="site-legal-mark" aria-hidden="true">M</span><span>MNB <span class="site-legal-brand-light">Resort</span></span></div>
+                <p class="site-legal-caption">A little clarity for a carefree stay.</p>
+            </div>
+            <nav class="site-legal-links" aria-label="Policies and privacy settings">
+                <div class="site-legal-group">
+                    <span class="site-legal-heading">GUEST POLICIES</span>
+                    <a href="{{ route('privacy') }}">Privacy policy</a>
+                    <a href="{{ route('terms') }}">Terms of service</a>
+                </div>
+                <div class="site-legal-group">
+                    <span class="site-legal-heading">YOUR BOOKING</span>
+                    <a href="{{ route('refund-policy') }}">Refund policy</a>
+                </div>
+                <div class="site-legal-group">
+                    <span class="site-legal-heading">PRIVACY CHOICES</span>
+                    <a href="{{ route('cookie-policy') }}">Cookie policy</a>
+                    <button type="button" id="cookie-settings">Cookie settings</button>
+                </div>
+            </nav>
+        </div>
+        <div class="site-legal-bottom"><span>© {{ date('Y') }} MNB Resort. All rights reserved.</span><span>Made for your next memorable stay.</span></div>
+    </footer>
+    <section id="cookie-banner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-description" hidden>
+        <div class="cookie-mark" aria-hidden="true">✦</div>
+        <p class="cookie-eyebrow">YOUR PRIVACY MATTERS</p>
+        <h2 id="cookie-title">A little note about cookies</h2>
+        <p id="cookie-description">We use essential session cookies to keep your account secure and the booking system working. We don’t use advertising or analytics cookies.</p>
+        <a class="cookie-policy-link" href="{{ route('cookie-policy') }}">Read our cookie policy <span aria-hidden="true">→</span></a>
+        <div class="cookie-actions"><button type="button" id="cookie-essential">Continue with essential cookies</button></div>
+    </section>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="app.js"></script>

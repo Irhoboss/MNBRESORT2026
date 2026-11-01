@@ -1608,12 +1608,15 @@ textarea {
 #auth.center.auth-shell:not(.hidden) {
     position: fixed;
     inset: 0;
+    align-items: flex-start;
     z-index: 30;
     width: 100%;
     height: 100vh;
     height: 100dvh;
     min-height: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .authbox {
@@ -1629,9 +1632,8 @@ textarea {
     gap: 0;
     margin: 0;
     padding: 0;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    height: auto;
+    overflow: visible;
     border-radius: 0;
     background: #f3f1e9;
     box-shadow: 18px 18px 42px #bdb9ad, -14px -14px 38px #f7f4e9;
@@ -1685,6 +1687,8 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
     padding: clamp(28px, 5vw, 64px);
     background: #f3f1e9;
 }
@@ -1696,6 +1700,13 @@ textarea {
 .auth-main input { min-height: 48px; border-radius: 14px; background: #f0eee6; box-shadow: inset 4px 4px 9px #d2cfc4, inset -4px -4px 9px #fff; }
 .auth-main input:focus { box-shadow: inset 3px 3px 7px #d2cfc4, inset -3px -3px 7px #fff, 0 0 0 3px rgba(35,170,163,.15); }
 .auth-main input::placeholder { color: #909185; }
+.auth-main input { color: #34372f; }
+.auth-main .auth-password-control { position: relative; width: 100%; min-width: 0; }
+.auth-main .auth-password-control>input { display: block; width: 100%; min-width: 0; padding-right: 54px; }
+.auth-password-toggle { position: absolute; top: 50%; right: 8px; display: grid; place-items: center; width: 40px; height: 40px; padding: 8px; color: #59645e; border: 0; border-radius: 10px; background: transparent; transform: translateY(-50%); cursor: pointer; }
+.auth-password-toggle:hover { color: #147e78; background: rgba(35,170,163,.1); }
+.auth-password-toggle svg { display: block; width: 21px; height: 21px; }
+.auth-error { width: 100%; padding: 11px 13px; color: #842b24; font-size: .88rem; line-height: 1.45; border: 1px solid #e8b1a4; border-radius: 12px; background: #fff0ec; }
 .auth-main .tabs { padding: 5px; border-radius: 16px; background: #ebe9e0; box-shadow: inset 3px 3px 7px #d2cfc4, inset -3px -3px 7px #fff; }
 .auth-main .tabs a { padding: 10px; text-decoration: none; }
 .auth-main .tabs a.on { border-radius: 12px; background: #f5f3ec; box-shadow: 3px 3px 7px #d2cfc4, -3px -3px 7px #fff; }
@@ -1731,13 +1742,13 @@ textarea {
 @media (max-width: 991.98px) {
     .authbox { width: 100%; min-height: 100vh; min-height: 100dvh; }
     .auth-visual { display: none; }
-    .auth-content { flex-basis: 100%; height: 100%; min-height: 0; padding: clamp(26px, 8vw, 72px); }
+    .auth-content { flex-basis: 100%; height: auto; min-height: 100vh; min-height: 100dvh; padding: clamp(26px, 8vw, 72px); }
 }
 
 @media (max-width: 480px) {
     .auth-shell { padding: 0; }
     .authbox { width: 100%; min-height: 100vh; min-height: 100dvh; border-radius: 0; }
-    .auth-content { height: 100%; min-height: 0; padding: 24px 22px; }
+    .auth-content { height: auto; min-height: 100vh; min-height: 100dvh; padding: 24px 22px; }
     .auth-main { gap: 15px; }
     .auth-main>.btn { min-height: 52px; font-size: 1rem; }
     .auth-main .btn.ghost { min-height: 42px; }
@@ -2363,3 +2374,49 @@ a, a:hover, a:focus { text-decoration: none }
 }
 @media(max-width:420px) { .dashboard-kpi { grid-column:span 12 } }
 @media(prefers-reduced-motion:reduce) { .donut,.donut:before,.rb1,.btn,.booking-actions .action-select,.inventory-tabs button { animation:none !important; transition:none !important } }
+.site-legal { padding:clamp(30px,5vw,56px) clamp(20px,7vw,80px) 20px; color:var(--ink); background:var(--bg); border-top:1px solid color-mix(in srgb,var(--mut) 18%,transparent); box-shadow:inset 0 8px 18px color-mix(in srgb,var(--sd) 24%,transparent) }
+.site-legal-inner { display:flex; align-items:flex-start; justify-content:space-between; gap:clamp(32px,7vw,100px); max-width:1240px; margin:0 auto; padding-bottom:clamp(28px,4vw,48px) }
+.site-legal-intro { flex:0 0 220px }
+.site-legal-brand { display:flex; align-items:center; gap:12px; color:var(--ink); font-size:1.35rem; font-weight:800; letter-spacing:.01em }
+.site-legal-brand-light { color:var(--ac); font-weight:500 }
+.site-legal-mark { display:grid; place-items:center; width:44px; height:44px; color:var(--ac); font-size:1.15rem; border-radius:15px; background:var(--bg); box-shadow:5px 5px 11px var(--sd),-5px -5px 11px var(--sl) }
+.site-legal-caption { margin:12px 0 0; color:var(--mut); font-size:.83rem; line-height:1.6 }
+.site-legal-links { display:grid; flex:1; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(18px,4vw,54px); max-width:820px }
+.site-legal-group { display:grid; align-content:start; justify-items:start; gap:10px }
+.site-legal-heading { margin:3px 0 4px; color:var(--mut); font-size:.66rem; font-weight:800; letter-spacing:.12em }
+.site-legal-links a,.site-legal-links button { display:inline-flex; align-items:center; min-height:30px; padding:4px 9px; color:var(--ink); font:inherit; font-size:.84rem; text-align:left; text-decoration:none; border:0; border-radius:9px; background:transparent; transition:color .18s ease,box-shadow .18s ease }
+.site-legal-links a:hover,.site-legal-links button:hover { color:var(--ac); box-shadow:3px 3px 7px var(--sd),-3px -3px 7px var(--sl) }
+.site-legal-links button { font-weight:700; cursor:pointer }
+.site-legal-bottom { display:flex; justify-content:space-between; gap:16px; max-width:1240px; margin:0 auto; padding-top:16px; color:var(--mut); font-size:.75rem; border-top:1px solid color-mix(in srgb,var(--mut) 22%,transparent) }
+@media(max-width:760px) { .site-legal-inner { flex-direction:column; gap:28px } .site-legal-intro { flex-basis:auto } .site-legal-links { width:100%; max-width:none } }
+@media(max-width:480px) { .site-legal { padding:28px 18px 16px } .site-legal-links { grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 12px } .site-legal-bottom { flex-direction:column; gap:5px } }
+body:has(#cookie-banner:not([hidden]))::after { position:fixed; z-index:9998; inset:0; content:""; background:rgba(24,47,46,.48); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px) }
+.cookie-banner { position:fixed; z-index:9999; top:50%; left:50%; display:grid; justify-items:center; width:min(490px,calc(100vw - 32px)); padding:clamp(26px,6vw,44px); color:#283b39; text-align:center; background:#edf1eb; border:1px solid rgba(255,255,255,.76); border-radius:30px; box-shadow:18px 18px 40px rgba(18,43,41,.28),-12px -12px 32px rgba(255,255,255,.2); transform:translate(-50%,-50%); animation:cookie-arrive .28s ease-out }
+.cookie-banner[hidden] { display:none!important }
+.cookie-mark { display:grid; place-items:center; width:56px; height:56px; margin-bottom:16px; color:#218f88; font-size:1.6rem; border-radius:20px; background:#edf1eb; box-shadow:6px 6px 13px #d0d7d0,-6px -6px 13px #fff }
+.cookie-eyebrow { margin:0 0 7px; color:#47817c; font-size:.7rem; font-weight:800; letter-spacing:.16em }
+.cookie-banner h2 { margin:0 0 12px; color:#243633; font-size:clamp(1.45rem,5vw,1.85rem); letter-spacing:-.035em }
+.cookie-banner #cookie-description { max-width:370px; margin:0; color:#64736e; font-size:.96rem; line-height:1.65 }
+.cookie-policy-link { display:inline-flex; align-items:center; gap:7px; margin:17px 0 23px; color:#147e78; font-size:.9rem; font-weight:700; text-decoration:none }
+.cookie-actions { display:flex; width:100% }
+.cookie-actions button { width:100%; min-height:52px; padding:.8rem 1rem; border:0; border-radius:16px; color:#fff; background:linear-gradient(135deg,#38aaa1,#208d86); box-shadow:6px 6px 13px #cbd2cb,-6px -6px 13px #fff; font:inherit; font-weight:700; cursor:pointer; transition:transform .18s ease,box-shadow .18s ease }
+.cookie-actions button:hover { transform:translateY(-2px); box-shadow:8px 8px 16px #c5cec6,-7px -7px 15px #fff }
+.cookie-actions button:active { transform:translateY(0); box-shadow:inset 4px 4px 8px #187c76,inset -3px -3px 7px #52c1b7 }
+.cookie-actions button:focus-visible, .site-legal a:focus-visible, .site-legal button:focus-visible, .legal-content a:focus-visible { outline:3px solid var(--ac); outline-offset:3px }
+.legal-page { min-height:100vh; padding:2rem 1rem; color:#17231f; background:#f7f8f6 }
+.legal-content { max-width:820px; margin:0 auto; padding:clamp(1.25rem,4vw,3rem); line-height:1.7; background:#fff; border-radius:16px; box-shadow:0 4px 24px #17231f12 }
+.legal-content h1 { margin-top:1.5rem }
+.legal-content h2 { margin-top:1.75rem; font-size:1.2rem }
+.auth-main #fr { gap:12px }
+.auth-main #fr.hidden ~ .registration-consent { display:none }
+.auth-main .registration-consent { display:grid; grid-template-columns:20px minmax(0,1fr); align-items:start; gap:10px; width:100%; min-width:0; margin:2px 0 0; color:#68736d; font-size:.86rem; line-height:1.55 }
+.auth-main .registration-consent input[type=checkbox] { appearance:none; display:grid; place-items:center; box-sizing:border-box; width:20px!important; min-width:20px!important; max-width:20px!important; height:20px!important; min-height:20px!important; max-height:20px!important; align-self:start; margin:2px 0 0; padding:0; border:1px solid #c7cec5; border-radius:6px; background:#f0eee6; box-shadow:inset 2px 2px 4px #d2cfc4,inset -2px -2px 4px #fff; cursor:pointer }
+.auth-main .registration-consent input[type=checkbox]::after { content:"✓"; color:#fff; font-size:14px; font-weight:800; opacity:0 }
+.auth-main .registration-consent input[type=checkbox]:checked { border-color:#238e87; background:#238e87; box-shadow:inset 2px 2px 4px #176c67,inset -2px -2px 4px #45b0a8 }
+.auth-main .registration-consent input[type=checkbox]:checked::after { opacity:1 }
+.registration-consent span { min-width:0 }
+.registration-consent a { color:#147e78; font-weight:700; text-decoration:underline; text-underline-offset:2px }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:3px solid #b34f00; outline-offset:2px }
+@keyframes cookie-arrive { from { opacity:0; transform:translate(-50%,-47%) scale(.98) } to { opacity:1; transform:translate(-50%,-50%) scale(1) } }
+@media(max-width:480px) { .cookie-banner { border-radius:24px; padding:28px 23px } .cookie-mark { width:48px; height:48px; border-radius:17px } }
+@media(prefers-reduced-motion:reduce) { .cookie-banner,.cookie-actions button,.site-legal-links a,.site-legal-links button { animation:none; transition:none } }
