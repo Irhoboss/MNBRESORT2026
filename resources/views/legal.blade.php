@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>{{ ['privacy' => 'Privacy Policy', 'terms' => 'Terms of Service', 'refund' => 'Refund Policy', 'cookies' => 'Cookie Policy'][$page] }} · MNB Resort</title>
+    <script>try { document.documentElement.dataset.theme = localStorage.mnbTheme || 'light' } catch (e) { }</script>
     <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
 <body class="legal-page">
