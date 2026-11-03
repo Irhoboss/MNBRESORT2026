@@ -19,6 +19,9 @@ function modal(h) { const m = document.createElement('div'); m.className = 'moda
 const dark = () => document.documentElement.dataset.theme == 'dark';
 function theme() { const t = dark() ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.mnbTheme = t } catch (e) { } $('#tb').innerHTML = ic(dark() ? 'sun' : 'moon') }
 let AUTH_REGISTER_STEP='start',AUTH_REGISTER_EMAIL='',AUTH_RESET_EMAIL='',AUTH_OTP_SECONDS=0,AUTH_OTP_TICK=null,AUTH_OTP_RESENDING=false;
+function scrollLandingCards(direction){const rail=$('#landing-destinations'),card=rail?.querySelector('.landing-destination-card');if(rail&&card)rail.scrollBy({left:direction*(card.getBoundingClientRect().width+12),behavior:'smooth'})}
+function openAuth(register=0){const landing=$('#landing'),auth=$('#auth');if(!auth)return;if(landing)landing.classList.add('hidden');auth.classList.remove('hidden');tab(register?1:0);window.scrollTo(0,0)}
+function closeAuth(){const auth=$('#auth'),landing=$('#landing');if(auth)auth.classList.add('hidden');if(landing)landing.classList.remove('hidden');window.scrollTo(0,0)}
 function clearAuthError(){ const error=$('#authError'); if(error){error.textContent='';error.classList.add('hidden')} }
 function showAuthError(message){ const error=$('#authError'); if(error){error.textContent=message||'Unable to continue. Please check your details and try again.';error.classList.remove('hidden')} }
 function togglePasswordVisibility(){
@@ -119,7 +122,8 @@ async function logout() { if (!confirm('Are you sure you want to log out?')) ret
 const messageBadge = badge; badge = async () => { await messageBadge(); try { const r = await api('me'), b = $('#nb'); NN = r.notif_unread || 0; if (b) b.innerHTML = ic('bell') + (NN ? `<em>${NN}</em>` : '') } catch (e) { } };
 async function badge() { try { const r = await api('me'); if (!r.user) return; if (r.unread > UN && CUR != 'msg') toast('💬 New message'); UN = r.unread; document.querySelectorAll('.mbd').forEach(e => { e.textContent = UN; e.style.display = UN ? '' : 'none' }) } catch (e) { } }
 async function boot() {
-const r = await api('me'); if (!r.user) { $('#auth').classList.remove('hidden'); return }
+const r = await api('me'); if (!r.user) { const landing=$('#landing'); if (landing) { landing.classList.remove('hidden'); $('#auth').classList.add('hidden') } else { $('#auth').classList.remove('hidden') } return }
+    $('#landing')?.classList.add('hidden');
     U = r.user; UN = r.unread; $('#auth').classList.add('hidden'); $('#app').classList.remove('hidden'); $('#who').textContent = U.full_name + ' · ' + U.user_role;
     $('#tb').innerHTML = ic(dark() ? 'sun' : 'moon'); $('#mb').innerHTML = ic('chat') + '<em class="mbd" style="display:none"></em>'; $('#nb').innerHTML = ic('bell'); $('#pb').innerHTML = ic('user'); $('#lb').innerHTML = ic('out'); setInterval(badge, 5000); go('home')
 }

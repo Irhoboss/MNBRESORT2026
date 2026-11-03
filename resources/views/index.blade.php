@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MNB Resort</title>
+    <meta name="description" content="Find your next coastal getaway at MNB Resort in Papaya, Nasugbu, Batangas. Explore beachfront rooms, family stays, and cottages.">
     <script>try { document.documentElement.dataset.theme = localStorage.mnbTheme || 'light' } catch (e) { }</script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -12,6 +13,105 @@
 </head>
 
 <body>
+    <div id="landing" class="landing-page">
+        <section id="home" class="landing-hero">
+            <header class="landing-nav">
+                <a class="landing-brand" href="#home" aria-label="MNB Resort home">
+                    <span class="landing-brand-mark">M</span>
+                    <span><b>MNB</b> <span>RESORT</span></span>
+                </a>
+                <nav class="landing-nav-links" aria-label="Main navigation">
+                    <a href="#home">Home</a>
+                    <a href="#stay">Stays</a>
+                    <a href="#experience">Explore</a>
+                    <a href="#experience">About us</a>
+                </nav>
+                <div class="landing-nav-actions">
+                    <button class="landing-login" type="button" onclick="openAuth(0)">Log in</button>
+                    <button class="landing-nav-cta" type="button" onclick="openAuth(1)">Book your stay <span aria-hidden="true">↗</span></button>
+                </div>
+            </header>
+
+            <div class="landing-hero-layout">
+                <div class="landing-hero-content">
+                    <span class="landing-eyebrow"><span></span> YOUR COASTAL ESCAPE · NASUGBU, BATANGAS</span>
+                    <h1>NEVER STOP<br>EXPLORING<br><em>THE SHORE.</em></h1>
+                    <p>Find your pace by the sea. From slow mornings to weekends with your favorite people, your next escape starts here.</p>
+                    <button class="landing-primary" type="button" onclick="openAuth(1)">Explore your stay <span aria-hidden="true">→</span></button>
+                    <div class="landing-location"><span aria-hidden="true">⌖</span> PAPAYA · NASUGBU · BATANGAS</div>
+                </div>
+                <div class="landing-discover">
+                    <div class="landing-discover-heading"><span>FIND YOUR ESCAPE</span><span>01 — 04</span></div>
+                    <div id="landing-destinations" class="landing-destinations" aria-label="Explore resort stays">
+                        <button class="landing-destination-card landing-destination-beach" type="button" onclick="openAuth(1)">
+                            <span class="landing-card-number">01 / SEA VIEW</span><span class="landing-card-name">BEACHFRONT</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
+                        </button>
+                        <button class="landing-destination-card landing-destination-suite" type="button" onclick="openAuth(1)">
+                            <span class="landing-card-number">02 / TOGETHER</span><span class="landing-card-name">FAMILY<br>SUITE</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
+                        </button>
+                        <button class="landing-destination-card landing-destination-garden" type="button" onclick="openAuth(1)">
+                            <span class="landing-card-number">03 / SLOW DOWN</span><span class="landing-card-name">GARDEN<br>COTTAGE</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
+                        </button>
+                        <button class="landing-destination-card landing-destination-picnic" type="button" onclick="openAuth(1)">
+                            <span class="landing-card-number">04 / OPEN AIR</span><span class="landing-card-name">PICNIC<br>COTTAGE</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
+                        </button>
+                    </div>
+                    <div class="landing-carousel-controls">
+                        <span>SCROLL TO DISCOVER</span>
+                        <div>
+                            <button type="button" aria-label="Previous stays" onclick="scrollLandingCards(-1)">←</button>
+                            <button type="button" aria-label="Next stays" onclick="scrollLandingCards(1)">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="stay" class="landing-stay-section">
+            <div class="landing-section-heading">
+                <div>
+                    <span class="landing-section-kicker">STAY A LITTLE CLOSER TO THE GOOD LIFE</span>
+                    <h2>Find your kind of <em>escape.</em></h2>
+                </div>
+                <p>Whether it is a quiet getaway or time together with everyone, there is a place for your next stay.</p>
+            </div>
+            <div class="landing-stay-grid">
+                <article class="landing-stay-card">
+                    <div class="landing-stay-art landing-stay-art-room"><span>01 / BY THE SHORE</span><i aria-hidden="true">◒</i></div>
+                    <div class="landing-stay-copy"><span>FOR SLOW MORNINGS</span><h3>Beachfront rooms</h3><p>Wake up near the water and leave a little more room for rest.</p></div>
+                </article>
+                <article class="landing-stay-card">
+                    <div class="landing-stay-art landing-stay-art-suite"><span>02 / TOGETHER</span><i aria-hidden="true">⌂</i></div>
+                    <div class="landing-stay-copy"><span>FOR YOUR FAVORITE PEOPLE</span><h3>Family suite</h3><p>Bring your people together for an easygoing change of scenery.</p></div>
+                </article>
+                <article class="landing-stay-card">
+                    <div class="landing-stay-art landing-stay-art-cottage"><span>03 / OPEN AIR</span><i aria-hidden="true">✳</i></div>
+                    <div class="landing-stay-copy"><span>FOR A CHANGE OF PACE</span><h3>Garden & picnic cottages</h3><p>Make space for fresh air, good company, and unhurried moments.</p></div>
+                </article>
+            </div>
+        </section>
+
+        <section id="experience" class="landing-experience">
+            <div class="landing-experience-copy">
+                <span class="landing-section-kicker">LESS PLANNING, MORE GETAWAY</span>
+                <h2>Your next stay,<br><em>made simple.</em></h2>
+                <p>Explore the available rooms, choose your dates, and keep your reservations together in one place.</p>
+                <button class="landing-primary" type="button" onclick="openAuth(1)">Start planning <span aria-hidden="true">→</span></button>
+            </div>
+            <div class="landing-experience-points">
+                <div><span>01</span><p><b>Explore your options</b><small>See resort stays and room details.</small></p><span aria-hidden="true">↗</span></div>
+                <div><span>02</span><p><b>Choose your dates</b><small>Find a stay that fits your plans.</small></p><span aria-hidden="true">↗</span></div>
+                <div><span>03</span><p><b>Keep it all together</b><small>Manage bookings from your account.</small></p><span aria-hidden="true">↗</span></div>
+            </div>
+        </section>
+
+        <section class="landing-final-cta">
+            <span class="landing-section-kicker">PAPAYA · NASUGBU · BATANGAS</span>
+            <h2>A little time away<br>can go a long way.</h2>
+            <button class="landing-primary" type="button" onclick="openAuth(1)">Find your stay <span aria-hidden="true">→</span></button>
+        </section>
+    </div>
+
     <div id="auth" class="center auth-shell hidden">
         <div class="authbox row g-0 container-fluid shadow-lg">
             <section class="auth-visual col-lg-7">
@@ -24,6 +124,7 @@
                 </div>
             </section>
             <section class="auth-content col-lg-5">
+            <button class="auth-back" type="button" onclick="closeAuth()">← Back to the resort</button>
             <div class="auth-main">
                 <div class="auth-heading"><span class="auth-kicker">WELCOME TO MNB RESORT</span><h2 id="authTitle">Welcome back</h2><p class="mut" id="authSubtitle">Log in to plan your next escape.</p></div>
                 <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
