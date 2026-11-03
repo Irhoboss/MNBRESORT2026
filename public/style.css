@@ -2628,3 +2628,116 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     .landing-discover-heading,.landing-carousel-controls { margin-right:17px }
 }
 @media(prefers-reduced-motion:reduce) { .landing-destination-card,.landing-carousel-controls button,.landing-nav-links a:after { transition:none } }
+
+/* Keep the landing navigation within reach while preserving its soft, raised surface. */
+.landing-page { scroll-behavior:smooth }
+.landing-nav {
+    position:fixed;
+    z-index:1000;
+    top:18px;
+    left:50%;
+    right:auto;
+    width:min(1240px,calc(100% - 72px));
+    min-height:66px;
+    padding:12px clamp(18px,3vw,38px);
+    color:#244b48;
+    border:1px solid #ffffffa8;
+    border-radius:22px;
+    background:rgba(231,241,238,.88);
+    box-shadow:8px 8px 20px #123b3b25,inset 2px 2px 7px #ffffffd9,inset -2px -2px 7px #b8cbc477;
+    -webkit-backdrop-filter:blur(16px);
+    backdrop-filter:blur(16px);
+    transform:translateX(-50%);
+    animation:landing-nav-arrive .55s ease both;
+}
+.landing-brand,.landing-nav-links a,.landing-login { color:#244b48 }
+.landing-brand-mark { color:#fff; border:0; background:#287d74; box-shadow:4px 4px 9px #244b4830,inset 1px 1px 3px #ffffff50 }
+.landing-brand>span:last-child>span { color:#488c80 }
+.landing-nav-links a,.landing-login { font-size:.66rem }
+.landing-nav-links a:after { background:#287d74 }
+.landing-nav-links a:hover,.landing-login:hover { color:#16877d }
+.landing-nav-cta { color:#27635d; border:1px solid #d3e3df; border-radius:999px; background:#eaf3f0; box-shadow:4px 4px 9px #244b4820,-4px -4px 9px #ffffffb8 }
+.landing-nav-cta:hover { color:#fff; background:#287d74; box-shadow:inset 2px 2px 5px #154d47,inset -2px -2px 5px #58a49a }
+.landing-hero-content { animation:landing-content-arrive .8s .08s ease both }
+.landing-destination-card { box-shadow:6px 8px 18px #063f4540,inset 1px 1px 0 #ffffff40 }
+.landing-destination-card:hover { transform:translateY(-5px) scale(1.015) }
+.landing-primary,.landing-nav-cta,.landing-carousel-controls button { transition:transform .22s ease,background .22s ease,box-shadow .22s ease }
+.landing-primary { box-shadow:5px 6px 13px #00393e45,inset 1px 1px 3px #ffffff45 }
+.landing-primary:hover { box-shadow:inset 3px 3px 7px #075d61,inset -3px -3px 7px #42b5b0 }
+@keyframes landing-nav-arrive { from { opacity:0; transform:translate(-50%,-8px) } to { opacity:1; transform:translate(-50%,0) } }
+@keyframes landing-content-arrive { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+@media(max-width:700px) {
+    .landing-nav { top:9px; width:calc(100% - 18px); min-height:56px; justify-content:center; padding:9px 12px; border-radius:18px }
+    .landing-nav .landing-brand,.landing-nav-actions { display:none }
+    .landing-nav-links { display:flex; justify-content:space-around; gap:clamp(12px,6vw,32px); width:100%; margin:0 }
+    .landing-nav-links a { font-size:.62rem; letter-spacing:.08em }
+}
+@media(prefers-reduced-motion:reduce) {
+    .landing-nav,.landing-hero-content { animation:none }
+    .landing-primary,.landing-nav-cta,.landing-destination-card,.landing-carousel-controls button { transition:none }
+}
+
+/* Shared dark palette for application screens, policy pages, and the legal footer. */
+html[data-theme=dark] {
+    --bg:#171c24;
+    --card:#202833;
+    --sd:#10151c;
+    --sl:#2c3743;
+    --ink:#edf3f1;
+    --mut:#b1c0bc;
+    --ac:#55c4b7;
+    --g:linear-gradient(135deg,#65c9c0,#329e96);
+    --ok:#55c995;
+    --bad:#ff8278;
+    color-scheme:dark;
+}
+html[data-theme=dark] body { color:var(--ink); background:var(--bg) }
+html[data-theme=dark] #app .n,
+html[data-theme=dark] #app .report-shell,
+html[data-theme=dark] #app .report-page,
+html[data-theme=dark] #app .inventory-page { color:var(--ink) }
+html[data-theme=dark] #app input,
+html[data-theme=dark] #app select,
+html[data-theme=dark] #app textarea { color:var(--ink); background:#202833 }
+html[data-theme=dark] #app input::placeholder,
+html[data-theme=dark] #app textarea::placeholder { color:#9eafaa; opacity:1 }
+html[data-theme=dark] #app option { color:#edf3f1; background:#202833 }
+html[data-theme=dark] #app .btn.ghost { color:var(--ink); background:var(--card) }
+html[data-theme=dark] #app td,html[data-theme=dark] #app th { color:var(--ink); border-color:#3a4651 }
+html[data-theme=dark] #app th,
+html[data-theme=dark] #app .mut,
+html[data-theme=dark] #app small { color:var(--mut) }
+html[data-theme=dark] #app .hb div { background:#131a21 }
+html[data-theme=dark] #app .badge.Pending { color:#ffd17a }
+html[data-theme=dark] #app .badge.Confirmed,html[data-theme=dark] #app .badge.Completed { color:#72ddb0 }
+html[data-theme=dark] #app .badge.Cancelled { color:#ff978f }
+html[data-theme=dark] #app .badge.Checked-In { color:#b1aaff }
+html[data-theme=dark] .site-legal {
+    --bg:#171c24; --card:#202833; --sd:#10151c; --sl:#2c3743;
+    --ink:#edf3f1; --mut:#b1c0bc; --ac:#55c4b7;
+    color:var(--ink); background:#171c24; border-color:#34414b;
+}
+html[data-theme=dark] .site-legal-links a,
+html[data-theme=dark] .site-legal-links button,
+html[data-theme=dark] .site-legal-brand { color:#edf3f1 }
+html[data-theme=dark] .site-legal-links a:hover,
+html[data-theme=dark] .site-legal-links button:hover { color:#70d8ca }
+html[data-theme=dark] .site-legal-heading,
+html[data-theme=dark] .site-legal-caption,
+html[data-theme=dark] .site-legal-bottom { color:#b1c0bc }
+html[data-theme=dark] .legal-page { color:#edf3f1; background:#171c24 }
+html[data-theme=dark] .legal-content { color:#edf3f1; background:#202833; box-shadow:8px 8px 22px #0b0f14,-5px -5px 16px #2b3641 }
+html[data-theme=dark] .legal-content p,
+html[data-theme=dark] .legal-content li { color:#c5d0cc }
+html[data-theme=dark] .legal-content a { color:#70d8ca }
+.hb i { transform:scaleX(0); transform-origin:left; animation:chart-grow .72s cubic-bezier(.2,.8,.2,1) both }
+.hb:nth-of-type(2) i { animation-delay:.05s }
+.hb:nth-of-type(3) i { animation-delay:.1s }
+.hb:nth-of-type(4) i { animation-delay:.15s }
+.hb:nth-of-type(5) i { animation-delay:.2s }
+.hb:nth-of-type(6) i { animation-delay:.25s }
+.hb:nth-of-type(7) i { animation-delay:.3s }
+@keyframes chart-grow { to { transform:scaleX(1) } }
+@media(prefers-reduced-motion:reduce) {
+    .bar i,.hb i,.donut,.donut:before,.ring circle,.rb1 { animation:none !important }
+}
