@@ -12,7 +12,45 @@ NAV.Admin = [['home', 'home', 'Dashboard'], ['group', '', 'Bookings'], ['res', '
 async function api(a, d, qs = '') { const token = document.querySelector('meta[name="csrf-token"]')?.content; const r = await fetch('api?a=' + a + qs, d ? { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token || '' }, body: JSON.stringify(d) } : {}); const raw = await r.text(); let j; try { j = JSON.parse(raw) } catch (e) { console.error('Non-JSON API response:', raw); throw new Error('The server returned an invalid response. Check the PHP error log.') } if (j.error) throw new Error(j.error); if (!r.ok) throw new Error('Request failed (' + r.status + ')'); return j }
 
 function saveCookieChoice() { try { localStorage.setItem('mnbCookieChoice', 'essential') } catch (e) {} const banner = document.querySelector('#cookie-banner'); if (banner) banner.hidden = true }
-document.addEventListener('DOMContentLoaded', () => { const banner = document.querySelector('#cookie-banner'); let choice = ''; try { choice = localStorage.getItem('mnbCookieChoice') || '' } catch (e) {} if (banner && !choice) banner.hidden = false; document.querySelector('#cookie-essential')?.addEventListener('click', saveCookieChoice); document.querySelector('#cookie-settings')?.addEventListener('click', () => { if (banner) { banner.hidden = false; document.querySelector('#cookie-essential')?.focus() } });initLandingMotion();document.querySelectorAll('#landing-nav-links a').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('#landing-nav-links a').forEach(link=>{link.classList.remove('is-current');link.removeAttribute('aria-current')});a.classList.add('is-current');a.setAttribute('aria-current','location');closeLandingMenu()})) });
+document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.querySelector('#cookie-banner');
+    let choice = '';
+    try { choice = localStorage.getItem('mnbCookieChoice') || '' } catch (e) {}
+    if (banner && !choice) banner.hidden = false;
+    document.querySelector('#cookie-essential')?.addEventListener('click', saveCookieChoice);
+    document.querySelector('#cookie-settings')?.addEventListener('click', () => {
+        if (banner) {
+            banner.hidden = false;
+            document.querySelector('#cookie-essential')?.focus();
+        }
+    });
+
+    initLandingMotion();
+    const navLinks = document.querySelectorAll('#landing-nav-links a');
+    navLinks.forEach(link => link.addEventListener('click', () => {
+        navLinks.forEach(item => {
+            item.classList.remove('is-current');
+            item.removeAttribute('aria-current');
+        });
+        link.classList.add('is-current');
+        link.setAttribute('aria-current', 'location');
+        positionLandingNavIndicator();
+        closeLandingMenu();
+    }));
+    positionLandingNavIndicator();
+    window.addEventListener('resize', positionLandingNavIndicator);
+});
+function positionLandingNavIndicator() {
+    const nav = document.querySelector('#landing-nav-links');
+    const indicator = nav?.querySelector('.landing-nav-indicator');
+    const activeLink = nav?.querySelector('a.is-current');
+    if (!nav || !indicator || !activeLink) return;
+
+    const navBounds = nav.getBoundingClientRect();
+    const linkBounds = activeLink.getBoundingClientRect();
+    indicator.style.width = `${linkBounds.width}px`;
+    indicator.style.transform = `translateX(${linkBounds.left - navBounds.left - nav.clientLeft}px)`;
+}
 function toast(m, bad) { const t = document.createElement('div'); t.className = 'toast' + (bad ? ' bad' : ''); t.textContent = m; document.body.append(t); setTimeout(() => t.remove(), 3200) }
 const T = async f => { try { return await f() } catch (e) { toast(e.message, 1) } };
 function modal(h) { const m = document.createElement('div'); m.className = 'modal' + (/Confirm check-(in|out)/i.test(h) ? ' checkin-modal' : ''); m.onclick = e => e.target == m && m.remove(); m.innerHTML = `<div class="n pad mbox">${h}<button class="btn ghost sm" onclick="this.closest('.modal').remove()">Close</button></div>`; document.body.append(m); return m }
