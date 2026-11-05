@@ -113,10 +113,10 @@ async function authGo() {
         }
         syncOtpBoxes();
         await api('verifyregister',{email:AUTH_REGISTER_EMAIL,code:$('#authOtp').value});
-        toast('Account created. Please log in using your email and password.');
         returnToAuthUi();
-        mode = 1;
-        tab(1);
+        stopOtpTimer();
+        toast('Account created successfully. Welcome to MNB Resort.');
+        return await boot();
     } catch (error) {
         showAuthError(error.message);
     } finally {
