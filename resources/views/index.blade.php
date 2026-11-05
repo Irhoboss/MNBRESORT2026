@@ -21,6 +21,7 @@
                     <span><b>MNB</b> <span>RESORT</span></span>
                 </a>
                 <nav id="landing-nav-links" class="landing-nav-links" aria-label="Main navigation">
+                    <span class="landing-nav-indicator" aria-hidden="true"></span>
                     <a href="#home" class="is-current" aria-current="location">Home</a>
                     <a href="#stay">Stays</a>
                     <a href="#experiences">Explore</a>
