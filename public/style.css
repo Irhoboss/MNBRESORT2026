@@ -227,6 +227,8 @@ small {
     align-items: center;
     justify-content: center;
     gap: 16px;
+    min-width: 0;
+    overflow-x: hidden;
     background: rgba(245, 245, 245, 0.96);
     border-radius: 24px;
     box-shadow: 0 18px 38px rgba(0, 0, 0, 0.15);
@@ -264,16 +266,19 @@ small {
 }
 
 .otp-digits {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(6px, 1vw, 12px);
+    width: min(100%, 480px);
+    max-width: 100%;
     margin-top: 4px;
 }
 
 .otp-box {
-    width: 52px !important;
-    height: 52px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    height: clamp(48px, 5vw, 60px) !important;
     border-radius: 12px;
     background: #eaeef4;
     border: 1px solid rgba(80, 90, 111, 0.12);
@@ -1672,7 +1677,7 @@ textarea {
     justify-content: space-between;
     padding: clamp(28px, 5vw, 58px);
     color: #fff;
-    background-image: linear-gradient(180deg, rgba(23, 68, 65, .14) 0%, rgba(28, 65, 61, .17) 34%, rgba(31, 63, 56, .82) 100%), url("/images/login/login_page_bg.jpg");
+    background-image: linear-gradient(180deg, rgba(23, 68, 65, .14) 0%, rgba(28, 65, 61, .17) 34%, rgba(31, 63, 56, .82) 100%), url("images/resort/login_page_bg.jpg");
     background-size: cover;
     background-position: center;
 }
@@ -1833,13 +1838,16 @@ textarea {
 
 .auth-error {
     width: 100%;
-    padding: 11px 13px;
-    color: #842b24;
+    padding: 13px 15px;
+    color: #743c34;
     font-size: .88rem;
     line-height: 1.45;
-    border: 1px solid #e8b1a4;
-    border-radius: 12px;
-    background: #fff0ec;
+    border: 1px solid rgba(195, 115, 98, .36);
+    border-radius: 16px;
+    background: rgba(255, 244, 239, .68);
+    box-shadow: 5px 5px 13px rgba(153, 113, 101, .14), -5px -5px 13px rgba(255, 255, 255, .76), inset 1px 1px 2px rgba(255, 255, 255, .82);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
 }
 
 .auth-main .tabs {
@@ -2023,7 +2031,7 @@ textarea {
         gap: 6px;
     }
     .otp-box {
-        width: 42px !important;
+        width: 100% !important;
         height: 48px !important;
     }
 }
@@ -4018,7 +4026,7 @@ textarea:focus-visible {
     overflow: hidden;
     color: #fff;
     border-radius: 30px;
-    background-image: linear-gradient(90deg, rgba(16, 45, 43, .78) 0%, rgba(17, 52, 48, .58) 46%, rgba(22, 51, 45, .15) 100%), linear-gradient(0deg, rgba(11, 35, 34, .34), transparent 40%), url("https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=2000&q=88");
+    background-image: linear-gradient(90deg, rgba(16, 45, 43, .78) 0%, rgba(17, 52, 48, .58) 46%, rgba(22, 51, 45, .15) 100%), linear-gradient(0deg, rgba(11, 35, 34, .34), transparent 40%), url("images/resort/landing_first_view.jpg");
     background-size: cover;
     background-position: center 55%
 }
@@ -4312,15 +4320,15 @@ textarea:focus-visible {
     transform: rotate(-7deg)
 }
 
-.landing-stay-art-room {
+.landing-stay-art-pool {
     background-image: linear-gradient(135deg, #82b9b1, #346c68 56%, #244b48)
 }
 
-.landing-stay-art-suite {
+.landing-stay-art-seating {
     background-image: linear-gradient(135deg, #c7a77b, #806e56 56%, #344b45)
 }
 
-.landing-stay-art-cottage {
+.landing-stay-art-nipa {
     background-image: linear-gradient(135deg, #aac08c, #66856c 54%, #35564d)
 }
 
@@ -4451,7 +4459,7 @@ textarea:focus-visible {
     padding: 65px 24px;
     text-align: center;
     color: #fff;
-    background-image: linear-gradient(90deg, #153b37b5, #153b377a), url("https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1800&q=82");
+    background-image: linear-gradient(90deg, #153b37b5, #153b377a), url("images/resort/landing_first_view.jpg");
     background-size: cover;
     background-position: center 63%
 }
@@ -4630,7 +4638,7 @@ textarea:focus-visible {
     padding: 0;
     isolation: isolate;
     border-radius: 12px;
-    background-image: linear-gradient(90deg, rgba(8, 50, 59, .49), rgba(8, 71, 79, .16) 58%, rgba(5, 70, 76, .18)), linear-gradient(0deg, rgba(8, 43, 48, .3), transparent 38%), url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90");
+    background-image: linear-gradient(90deg, rgba(8, 50, 59, .49), rgba(8, 71, 79, .16) 58%, rgba(5, 70, 76, .18)), linear-gradient(0deg, rgba(8, 43, 48, .3), transparent 38%), url("images/resort/landing_first_view.jpg");
     background-position: center 55%;
     box-shadow: 0 20px 60px #123b3b26
 }
@@ -4956,19 +4964,19 @@ textarea:focus-visible {
 }
 
 .landing-destination-beach {
-    background-image: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=85")
+    background-image: url("images/resort/landing_first_view.jpg")
 }
 
 .landing-destination-suite {
-    background-image: url("https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=85")
+    background-image: url("images/resort/beachfront.jpg")
 }
 
 .landing-destination-garden {
-    background-image: url("https://images.unsplash.com/photo-1449158743715-0a90dc1c1b6e?auto=format&fit=crop&w=600&q=85")
+    background-image: url("images/resort/login_page_bg.jpg")
 }
 
 .landing-destination-picnic {
-    background-image: url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=85")
+    background-image: url("images/resort/888096260_4511499615730299_4027688475139904702_n.jpg")
 }
 
 .landing-card-number {
@@ -5053,16 +5061,16 @@ textarea:focus-visible {
     display: none
 }
 
-.landing-stay-art-room {
-    background-image: linear-gradient(180deg, #153f3820, #173d3766), url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=82")
+.landing-stay-art-pool {
+    background-image: linear-gradient(180deg, #153f3820, #173d3766), url("images/resort/beachfront.jpg")
 }
 
-.landing-stay-art-suite {
-    background-image: linear-gradient(180deg, #153f3820, #173d3766), url("https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=900&q=82")
+.landing-stay-art-seating {
+    background-image: linear-gradient(180deg, #153f3820, #173d3766), url("images/resort/886892650_1138342398733462_7079128441454523868_n.jpg")
 }
 
-.landing-stay-art-cottage {
-    background-image: linear-gradient(180deg, #153f3820, #173d3766), url("https://images.unsplash.com/photo-1449158743715-0a90dc1c1b6e?auto=format&fit=crop&w=900&q=82")
+.landing-stay-art-nipa {
+    background-image: linear-gradient(180deg, #153f3820, #173d3766), url("images/resort/888096260_4511499615730299_4027688475139904702_n.jpg")
 }
 
 .auth-back {
@@ -5662,7 +5670,7 @@ html[data-theme=dark] .legal-content a {
 }
 
 .landing-hero {
-    background-image: linear-gradient(90deg, rgba(20, 49, 30, .66), rgba(20, 49, 30, .23) 62%, rgba(15, 48, 31, .12)), linear-gradient(0deg, rgba(16, 43, 25, .24), transparent 42%), url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90")
+    background-image: linear-gradient(90deg, rgba(20, 49, 30, .66), rgba(20, 49, 30, .23) 62%, rgba(15, 48, 31, .12)), linear-gradient(0deg, rgba(16, 43, 25, .24), transparent 42%), url("images/resort/landing_first_view.jpg")
 }
 
 .landing-hero h1 em {
@@ -5826,7 +5834,7 @@ html[data-theme=dark] .landing-page {
     overflow: hidden;
     border: 8px solid #f6f8f2;
     border-radius: 28px;
-    background: linear-gradient(0deg, #163d2c55, transparent 40%), url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1500&q=88") center/cover;
+    background: linear-gradient(0deg, #163d2c55, transparent 40%), url("images/resort/landing_first_view.jpg") center/cover;
     box-shadow: 10px 14px 30px #173d2b35, inset 2px 2px 5px #ffffff70;
     cursor: zoom-in;
     animation: landing-photo-drift 12s ease-in-out infinite alternate
@@ -6179,7 +6187,7 @@ html[data-theme=dark] .landing-page {
     min-height: 330px;
     border: 7px solid #edf3ed;
     border-radius: 23px;
-    background: url("https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=1300&q=88") center/cover;
+    background: url("images/resort/login_page_bg.jpg") center/cover;
     box-shadow: 7px 10px 22px #244b4828;
     animation: landing-photo-drift 13s ease-in-out infinite alternate-reverse
 }
@@ -6593,8 +6601,9 @@ html[data-theme=dark] .landing-page {
 }
 
 .landing-nav {
-    position: absolute;
-    top: -84px;
+    position: fixed;
+    z-index: 1000;
+    top: 18px;
     left: 50%;
     right: auto;
     transform: translateX(-50%)

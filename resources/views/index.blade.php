@@ -44,20 +44,20 @@
                     <div class="landing-location"><span aria-hidden="true">⌖</span> PAPAYA · NASUGBU · BATANGAS</div>
                 </div>
                 <div class="landing-hero-visual">
-                    <button class="landing-hero-photo" type="button" aria-label="View the MNB Resort coastline" onclick="openLandingPhoto('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2000&q=90','A quiet day by the coast')"><span class="landing-hero-photo-label">PAPAYA, NASUGBU <b>↗</b></span></button>
+                    <button class="landing-hero-photo" type="button" aria-label="View the Papaya coastline with hills and colorful flags" onclick="openLandingPhoto('images/resort/landing_first_view.jpg','Papaya coastline with hills and colorful flags')"><span class="landing-hero-photo-label">PAPAYA COASTLINE · NASUGBU <b>↗</b></span></button>
                     <div class="landing-hero-float landing-hero-float-one"><span>⌁</span><div><b>Closer to the coast</b><small>Make room to slow down</small></div></div>
                     <div class="landing-hero-float landing-hero-float-two"><b>Find your pace.</b><span>Stay by the sea</span></div>
                 </div>
             </div>
         </section>
 
-        <section class="landing-pick-section landing-reveal" aria-label="Explore resort stays">
-            <div class="landing-pick-heading"><div><span class="landing-section-kicker">FIND YOUR KIND OF STAY</span><h2>A place for <em>your people.</em></h2></div><div class="landing-carousel-controls"><span>SWIPE TO EXPLORE</span><div><button type="button" aria-label="Previous stays" onclick="scrollLandingCards(-1)">←</button><button type="button" aria-label="Next stays" onclick="scrollLandingCards(1)">→</button></div></div></div>
+        <section class="landing-pick-section landing-reveal" aria-label="MNB Resort photo gallery">
+            <div class="landing-pick-heading"><div><span class="landing-section-kicker">PHOTOS FROM PAPAYA, NASUGBU</span><h2>A look around <em>MNB Resort.</em></h2></div><div class="landing-carousel-controls"><span>SWIPE TO EXPLORE</span><div><button type="button" aria-label="Previous photos" onclick="scrollLandingCards(-1)">←</button><button type="button" aria-label="Next photos" onclick="scrollLandingCards(1)">→</button></div></div></div>
             <div id="landing-destinations" class="landing-destinations">
-                <button class="landing-destination-card landing-destination-beach" type="button" onclick="openAuth(1)"><span class="landing-card-number">01 / BY THE WATER</span><span class="landing-card-name">BEACHFRONT<br>ROOMS</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
-                <button class="landing-destination-card landing-destination-suite" type="button" onclick="openAuth(1)"><span class="landing-card-number">02 / TOGETHER</span><span class="landing-card-name">FAMILY<br>SUITES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
-                <button class="landing-destination-card landing-destination-garden" type="button" onclick="openAuth(1)"><span class="landing-card-number">03 / SLOW DOWN</span><span class="landing-card-name">GARDEN<br>COTTAGES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
-                <button class="landing-destination-card landing-destination-picnic" type="button" onclick="openAuth(1)"><span class="landing-card-number">04 / OPEN AIR</span><span class="landing-card-name">PICNIC<br>COTTAGES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-beach" type="button" aria-label="View photo of the Papaya coastline, hills, and flags" onclick="openLandingPhoto('images/resort/landing_first_view.jpg','Papaya coastline with hills and colorful flags')"><span class="landing-card-number">01 / COASTLINE</span><span class="landing-card-name">PAPAYA<br>SHORE</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-suite" type="button" aria-label="View photo of the resort pool and cottages" onclick="openLandingPhoto('images/resort/beachfront.jpg','Resort pool, cottages, and garden')"><span class="landing-card-number">02 / POOLSIDE</span><span class="landing-card-name">POOL &<br>COTTAGES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-garden" type="button" aria-label="View photo of the MNB Resort entrance sign" onclick="openLandingPhoto('images/resort/login_page_bg.jpg','MNB Resort entrance sign and outdoor seating')"><span class="landing-card-number">03 / RESORT ENTRANCE</span><span class="landing-card-name">MNB RESORT<br>SIGN</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-picnic" type="button" aria-label="View photo of the open-air nipa hut dining area" onclick="openLandingPhoto('images/resort/888096260_4511499615730299_4027688475139904702_n.jpg','Open-air nipa hut with a bamboo dining table')"><span class="landing-card-number">04 / OPEN AIR</span><span class="landing-card-name">NIPA-HUT<br>DINING</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
             </div>
         </section>
 
@@ -69,20 +69,20 @@
                     <span class="landing-section-kicker">STAY A LITTLE CLOSER TO THE GOOD LIFE</span>
                     <h2>Find your kind of <em>escape.</em></h2>
                 </div>
-                <p>Whether it is a quiet getaway or time together with everyone, there is a place for your next stay.</p>
+                <p>Photos of the resort pool, seaside seating, and open-air nipa hut dining area.</p>
             </div>
             <div class="landing-stay-grid">
                 <article class="landing-stay-card">
-                    <div class="landing-stay-art landing-stay-art-room"><span>01 / BY THE SHORE</span><button class="landing-photo-open" type="button" aria-label="View beachfront room photo" onclick="openLandingPhoto('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1800&q=88','Beachfront rooms')">View photo <b aria-hidden="true">↗</b></button></div>
-                    <div class="landing-stay-copy"><span>FOR SLOW MORNINGS</span><h3>Beachfront rooms</h3><p>Wake up near the water and leave a little more room for rest.</p></div>
+                    <div class="landing-stay-art landing-stay-art-pool"><span>01 / POOLSIDE</span><button class="landing-photo-open" type="button" aria-label="View resort pool, cottages, and garden photo" onclick="openLandingPhoto('images/resort/beachfront.jpg','Resort pool, cottages, and garden')">View photo <b aria-hidden="true">↗</b></button></div>
+                    <div class="landing-stay-copy"><span>POOL & GARDEN</span><h3>Resort pool and cottages</h3><p>The swimming pool, landscaped grounds, and cottages beside the bay.</p></div>
                 </article>
                 <article class="landing-stay-card">
-                    <div class="landing-stay-art landing-stay-art-suite"><span>02 / TOGETHER</span><button class="landing-photo-open" type="button" aria-label="View family suite photo" onclick="openLandingPhoto('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=88','Family suite')">View photo <b aria-hidden="true">↗</b></button></div>
-                    <div class="landing-stay-copy"><span>FOR YOUR FAVORITE PEOPLE</span><h3>Family suite</h3><p>Bring your people together for an easygoing change of scenery.</p></div>
+                    <div class="landing-stay-art landing-stay-art-seating"><span>02 / BY THE BAY</span><button class="landing-photo-open" type="button" aria-label="View outdoor wooden seating beside the pool and bay" onclick="openLandingPhoto('images/resort/886892650_1138342398733462_7079128441454523868_n.jpg','Outdoor wooden seating beside the pool and bay')">View photo <b aria-hidden="true">↗</b></button></div>
+                    <div class="landing-stay-copy"><span>OUTDOOR SEATING</span><h3>Seaside table and chairs</h3><p>Wooden outdoor seating with a view toward the pool and the bay.</p></div>
                 </article>
                 <article class="landing-stay-card">
-                    <div class="landing-stay-art landing-stay-art-cottage"><span>03 / OPEN AIR</span><button class="landing-photo-open" type="button" aria-label="View garden cottage photo" onclick="openLandingPhoto('https://images.unsplash.com/photo-1449158743715-0a90dc1c1b6e?auto=format&fit=crop&w=1800&q=88','Garden and picnic cottages')">View photo <b aria-hidden="true">↗</b></button></div>
-                    <div class="landing-stay-copy"><span>FOR A CHANGE OF PACE</span><h3>Garden & picnic cottages</h3><p>Make space for fresh air, good company, and unhurried moments.</p></div>
+                    <div class="landing-stay-art landing-stay-art-nipa"><span>03 / OPEN AIR</span><button class="landing-photo-open" type="button" aria-label="View open-air nipa hut with bamboo dining table" onclick="openLandingPhoto('images/resort/888096260_4511499615730299_4027688475139904702_n.jpg','Open-air nipa hut with a bamboo dining table')">View photo <b aria-hidden="true">↗</b></button></div>
+                    <div class="landing-stay-copy"><span>SHADED DINING AREA</span><h3>Open-air nipa hut</h3><p>A shaded nipa hut with a long bamboo table and garden surroundings.</p></div>
                 </article>
             </div>
         </section>
@@ -99,7 +99,7 @@
 
         <section class="landing-story-band landing-reveal">
             <div><span class="landing-section-kicker">YOUR COASTAL RESET</span><h2>Slow mornings.<br><em>Longer moments.</em></h2><p>Trade the rush for fresh air, time together, and a little more room to breathe in Papaya, Nasugbu.</p><button class="landing-primary" type="button" onclick="openAuth(1)">Plan your getaway <span aria-hidden="true">→</span></button></div>
-            <div class="landing-story-photo" role="img" aria-label="A tropical resort garden"></div>
+            <div class="landing-story-photo" role="img" aria-label="MNB Resort entrance sign beside outdoor seating and greenery"></div>
         </section>
 
         <section id="experience" class="landing-experience">

@@ -1,2 +1,6 @@
 *
 !.gitignore
+!/public/
+!/public/images/
+!/public/images/resort/
+!/public/images/resort/**
