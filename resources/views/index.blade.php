@@ -20,12 +20,14 @@
                     <span class="landing-brand-mark">M</span>
                     <span><b>MNB</b> <span>RESORT</span></span>
                 </a>
-                <nav class="landing-nav-links" aria-label="Main navigation">
-                    <a href="#home">Home</a>
+                <nav id="landing-nav-links" class="landing-nav-links" aria-label="Main navigation">
+                    <a href="#home" class="is-current" aria-current="location">Home</a>
                     <a href="#stay">Stays</a>
-                    <a href="#experience">Explore</a>
+                    <a href="#experiences">Explore</a>
                     <a href="#experience">About us</a>
+                    <a href="#questions">FAQs</a>
                 </nav>
+                <button class="landing-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="landing-nav-links" aria-expanded="false" onclick="toggleLandingMenu(this)"><span></span><span></span></button>
                 <div class="landing-nav-actions">
                     <button class="landing-login" type="button" onclick="openAuth(0)">Log in</button>
                     <button class="landing-nav-cta" type="button" onclick="openAuth(1)">Book your stay <span aria-hidden="true">↗</span></button>
@@ -40,32 +42,25 @@
                     <button class="landing-primary" type="button" onclick="openAuth(1)">Explore your stay <span aria-hidden="true">→</span></button>
                     <div class="landing-location"><span aria-hidden="true">⌖</span> PAPAYA · NASUGBU · BATANGAS</div>
                 </div>
-                <div class="landing-discover">
-                    <div class="landing-discover-heading"><span>FIND YOUR ESCAPE</span><span>01 — 04</span></div>
-                    <div id="landing-destinations" class="landing-destinations" aria-label="Explore resort stays">
-                        <button class="landing-destination-card landing-destination-beach" type="button" onclick="openAuth(1)">
-                            <span class="landing-card-number">01 / SEA VIEW</span><span class="landing-card-name">BEACHFRONT</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
-                        </button>
-                        <button class="landing-destination-card landing-destination-suite" type="button" onclick="openAuth(1)">
-                            <span class="landing-card-number">02 / TOGETHER</span><span class="landing-card-name">FAMILY<br>SUITE</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
-                        </button>
-                        <button class="landing-destination-card landing-destination-garden" type="button" onclick="openAuth(1)">
-                            <span class="landing-card-number">03 / SLOW DOWN</span><span class="landing-card-name">GARDEN<br>COTTAGE</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
-                        </button>
-                        <button class="landing-destination-card landing-destination-picnic" type="button" onclick="openAuth(1)">
-                            <span class="landing-card-number">04 / OPEN AIR</span><span class="landing-card-name">PICNIC<br>COTTAGE</span><span class="landing-card-arrow" aria-hidden="true">↗</span>
-                        </button>
-                    </div>
-                    <div class="landing-carousel-controls">
-                        <span>SCROLL TO DISCOVER</span>
-                        <div>
-                            <button type="button" aria-label="Previous stays" onclick="scrollLandingCards(-1)">←</button>
-                            <button type="button" aria-label="Next stays" onclick="scrollLandingCards(1)">→</button>
-                        </div>
-                    </div>
+                <div class="landing-hero-visual">
+                    <button class="landing-hero-photo" type="button" aria-label="View the MNB Resort coastline" onclick="openLandingPhoto('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2000&q=90','A quiet day by the coast')"><span class="landing-hero-photo-label">PAPAYA, NASUGBU <b>↗</b></span></button>
+                    <div class="landing-hero-float landing-hero-float-one"><span>⌁</span><div><b>Closer to the coast</b><small>Make room to slow down</small></div></div>
+                    <div class="landing-hero-float landing-hero-float-two"><b>Find your pace.</b><span>Stay by the sea</span></div>
                 </div>
             </div>
         </section>
+
+        <section class="landing-pick-section landing-reveal" aria-label="Explore resort stays">
+            <div class="landing-pick-heading"><div><span class="landing-section-kicker">FIND YOUR KIND OF STAY</span><h2>A place for <em>your people.</em></h2></div><div class="landing-carousel-controls"><span>SWIPE TO EXPLORE</span><div><button type="button" aria-label="Previous stays" onclick="scrollLandingCards(-1)">←</button><button type="button" aria-label="Next stays" onclick="scrollLandingCards(1)">→</button></div></div></div>
+            <div id="landing-destinations" class="landing-destinations">
+                <button class="landing-destination-card landing-destination-beach" type="button" onclick="openAuth(1)"><span class="landing-card-number">01 / BY THE WATER</span><span class="landing-card-name">BEACHFRONT<br>ROOMS</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-suite" type="button" onclick="openAuth(1)"><span class="landing-card-number">02 / TOGETHER</span><span class="landing-card-name">FAMILY<br>SUITES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-garden" type="button" onclick="openAuth(1)"><span class="landing-card-number">03 / SLOW DOWN</span><span class="landing-card-name">GARDEN<br>COTTAGES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+                <button class="landing-destination-card landing-destination-picnic" type="button" onclick="openAuth(1)"><span class="landing-card-number">04 / OPEN AIR</span><span class="landing-card-name">PICNIC<br>COTTAGES</span><span class="landing-card-arrow" aria-hidden="true">↗</span></button>
+            </div>
+        </section>
+
+        <div class="landing-trust-strip" aria-label="Resort highlights"><span>BEACH ACCESS</span><i></i><span>ROOMS & COTTAGES</span><i></i><span>SWIMMING</span><i></i><span>EVENT SPACE</span></div>
 
         <section id="stay" class="landing-stay-section">
             <div class="landing-section-heading">
@@ -77,18 +72,33 @@
             </div>
             <div class="landing-stay-grid">
                 <article class="landing-stay-card">
-                    <div class="landing-stay-art landing-stay-art-room"><span>01 / BY THE SHORE</span><i aria-hidden="true">◒</i></div>
+                    <div class="landing-stay-art landing-stay-art-room"><span>01 / BY THE SHORE</span><button class="landing-photo-open" type="button" aria-label="View beachfront room photo" onclick="openLandingPhoto('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1800&q=88','Beachfront rooms')">View photo <b aria-hidden="true">↗</b></button></div>
                     <div class="landing-stay-copy"><span>FOR SLOW MORNINGS</span><h3>Beachfront rooms</h3><p>Wake up near the water and leave a little more room for rest.</p></div>
                 </article>
                 <article class="landing-stay-card">
-                    <div class="landing-stay-art landing-stay-art-suite"><span>02 / TOGETHER</span><i aria-hidden="true">⌂</i></div>
+                    <div class="landing-stay-art landing-stay-art-suite"><span>02 / TOGETHER</span><button class="landing-photo-open" type="button" aria-label="View family suite photo" onclick="openLandingPhoto('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=88','Family suite')">View photo <b aria-hidden="true">↗</b></button></div>
                     <div class="landing-stay-copy"><span>FOR YOUR FAVORITE PEOPLE</span><h3>Family suite</h3><p>Bring your people together for an easygoing change of scenery.</p></div>
                 </article>
                 <article class="landing-stay-card">
-                    <div class="landing-stay-art landing-stay-art-cottage"><span>03 / OPEN AIR</span><i aria-hidden="true">✳</i></div>
+                    <div class="landing-stay-art landing-stay-art-cottage"><span>03 / OPEN AIR</span><button class="landing-photo-open" type="button" aria-label="View garden cottage photo" onclick="openLandingPhoto('https://images.unsplash.com/photo-1449158743715-0a90dc1c1b6e?auto=format&fit=crop&w=1800&q=88','Garden and picnic cottages')">View photo <b aria-hidden="true">↗</b></button></div>
                     <div class="landing-stay-copy"><span>FOR A CHANGE OF PACE</span><h3>Garden & picnic cottages</h3><p>Make space for fresh air, good company, and unhurried moments.</p></div>
                 </article>
             </div>
+        </section>
+
+        <section id="experiences" class="landing-feature-section landing-reveal">
+            <div class="landing-feature-heading"><span class="landing-section-kicker">A LITTLE SOMETHING FOR EVERY KIND OF DAY</span><h2>Make the most of<br><em>your time away.</em></h2></div>
+            <div class="landing-feature-grid">
+                <article class="landing-feature-card"><span>01</span><b>Room to unwind</b><p>Choose from guest rooms, family suites, and cottages.</p><i aria-hidden="true">⌂</i></article>
+                <article class="landing-feature-card"><span>02</span><b>Time by the water</b><p>Enjoy beach access and swimming during your stay.</p><i aria-hidden="true">⌁</i></article>
+                <article class="landing-feature-card"><span>03</span><b>Space to gather</b><p>Plan an easygoing visit with your favorite people.</p><i aria-hidden="true">✳</i></article>
+                <article class="landing-feature-card"><span>04</span><b>Help when you need it</b><p>Keep your booking details and messages together.</p><i aria-hidden="true">↗</i></article>
+            </div>
+        </section>
+
+        <section class="landing-story-band landing-reveal">
+            <div><span class="landing-section-kicker">YOUR COASTAL RESET</span><h2>Slow mornings.<br><em>Longer moments.</em></h2><p>Trade the rush for fresh air, time together, and a little more room to breathe in Papaya, Nasugbu.</p><button class="landing-primary" type="button" onclick="openAuth(1)">Plan your getaway <span aria-hidden="true">→</span></button></div>
+            <div class="landing-story-photo" role="img" aria-label="A tropical resort garden"></div>
         </section>
 
         <section id="experience" class="landing-experience">
@@ -109,6 +119,16 @@
             <span class="landing-section-kicker">PAPAYA · NASUGBU · BATANGAS</span>
             <h2>A little time away<br>can go a long way.</h2>
             <button class="landing-primary" type="button" onclick="openAuth(1)">Find your stay <span aria-hidden="true">→</span></button>
+        </section>
+
+        <section class="landing-faq-section landing-reveal" id="questions">
+            <div class="landing-faq-heading"><span class="landing-section-kicker">GOOD TO KNOW</span><h2>Questions before<br><em>you get away?</em></h2><p>Here are a few helpful details for planning your visit.</p></div>
+            <div class="landing-faq-list">
+                <details><summary>What kinds of stays can I book?<span>+</span></summary><p>Explore guest rooms, family suites, garden cottages, and picnic cottages. Availability appears after you choose dates.</p></details>
+                <details><summary>How do I know if my booking is confirmed?<span>+</span></summary><p>Check My Bookings and Notifications in your account. Staff confirmation also sends a notification.</p></details>
+                <details><summary>Where can I find my booking QR code?<span>+</span></summary><p>Open Receipt & QR from My Bookings after your reservation is confirmed.</p></details>
+                <details><summary>Can I contact the resort about my stay?<span>+</span></summary><p>Log in and use Messages to coordinate details with resort staff.</p></details>
+            </div>
         </section>
     </div>
 
