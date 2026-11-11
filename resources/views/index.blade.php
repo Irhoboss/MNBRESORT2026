@@ -8,7 +8,7 @@
     <meta name="description" content="Find your next coastal getaway at MNB Resort in Papaya, Nasugbu, Batangas. Explore beachfront rooms, family stays, and cottages.">
     <script>try { document.documentElement.dataset.theme = localStorage.mnbTheme || 'light' } catch (e) { }</script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v={{ hash_file('sha256', public_path('style.css')) }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
@@ -31,7 +31,7 @@
                 <button class="landing-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="landing-nav-links" aria-expanded="false" onclick="toggleLandingMenu(this)"><span></span><span></span></button>
                 <div class="landing-nav-actions">
                     <button class="landing-login" type="button" onclick="openAuth(0)">Log in</button>
-                    <button class="landing-nav-cta" type="button" onclick="openAuth(1)">Book your stay <span aria-hidden="true">↗</span></button>
+                    <button class="landing-nav-cta" type="button" onclick="openAuth(true)">Book your stay <span aria-hidden="true">↗</span></button>
                 </div>
             </header>
 
@@ -172,12 +172,12 @@
                 <h2>Check your email</h2>
                 <p>We sent a 6-digit verification code to <strong id="otpEmailText">your@email.com</strong></p>
                 <div class="otp-digits" aria-label="One-time password input">
-                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 1" />
-                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 2" />
-                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 3" />
-                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 4" />
-                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 5" />
-                    <input class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 6" />
+                    <input id="otpDigit1" class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 1" />
+                    <input id="otpDigit2" class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 2" />
+                    <input id="otpDigit3" class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 3" />
+                    <input id="otpDigit4" class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 4" />
+                    <input id="otpDigit5" class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 5" />
+                    <input id="otpDigit6" class="otp-box" maxlength="1" inputmode="numeric" aria-label="Digit 6" />
                 </div>
                 <div class="otp-timer">Code expires in <span id="otpExpiresText">09:47</span></div>
                 <div class="otp-actions">
@@ -237,7 +237,7 @@
     </section>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v={{ hash_file('sha256', public_path('app.js')) }}"></script>
 </body>
 
 </html>
