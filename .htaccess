@@ -1,11 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /mnb-resort/
-
-    RewriteRule ^$ public/ [R=302,L]
-
-    RewriteCond %{REQUEST_URI} !/public/
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ public/$1 [R=307,L]
+    RewriteRule ^public/ - [L]
+    RewriteRule ^$ %{REQUEST_URI}public/ [R=302,L,NE]
+    RewriteCond %{REQUEST_URI} ^(.*/) [NC]
+    RewriteRule ^(.+)$ %1public/$1 [R=302,L,NE]
 </IfModule>

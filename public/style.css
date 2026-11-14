@@ -34,6 +34,7 @@ html[data-theme=dark] #auth.auth-shell {
     --mut: #777968;
     --ac: #23aaa3;
     --g: linear-gradient(135deg, #6db3b7, #23aaa3);
+    color-scheme: light;
     color: #34372f;
     background: #ddd9cc
 }
@@ -77,11 +78,10 @@ html[data-theme=dark] #auth #otpPanel .otp-submit {
 
 /* Reviews and QR check-in stay high contrast in dark theme. */
 
+/* Reviews stay high contrast in dark theme. */
 html[data-theme=dark] #main:has(.review)>.n,
 html[data-theme=dark] #main:has(.review) .review,
-html[data-theme=dark] #main:has(#reader)>.n,
-html[data-theme=dark] #main:has(.review),
-html[data-theme=dark] #main:has(#reader) {
+html[data-theme=dark] #main:has(.review) {
     --bg: #f1f0e9;
     --card: #fbfaf5;
     --sd: #d5d3c9;
@@ -99,16 +99,13 @@ html[data-theme=dark] #main:has(.review) .review {
 html[data-theme=dark] #main:has(.review) .review p,
 html[data-theme=dark] #main:has(.review) .review small,
 html[data-theme=dark] #main:has(.review) .mut,
-html[data-theme=dark] #main:has(#reader) .mut,
-html[data-theme=dark] #main:has(#reader) label {
+html[data-theme=dark] #main:has(.review) label {
     color: #555b52
 }
 
 html[data-theme=dark] #main:has(.review) input,
 html[data-theme=dark] #main:has(.review) select,
-html[data-theme=dark] #main:has(.review) textarea,
-html[data-theme=dark] #main:has(#reader) input,
-html[data-theme=dark] #main:has(#reader) select {
+html[data-theme=dark] #main:has(.review) textarea {
     color: #34372f;
     background: #fff;
     box-shadow: inset 3px 3px 7px #d5d3c9, inset -3px -3px 7px #fff
@@ -732,6 +729,19 @@ th {
     display: flex;
     gap: 5px;
     flex-wrap: wrap
+}
+
+#admUsers {
+    min-width: 900px
+}
+
+#admUsers td.acts {
+    display: table-cell;
+    white-space: nowrap
+}
+
+#admUsers td.acts .btn + .btn {
+    margin-left: 5px
 }
 
 .booking-table {
@@ -2530,13 +2540,11 @@ a:focus {
 .dashboard-mascot {
     display: grid;
     place-items: center;
+    flex: 0 0 auto;
     width: clamp(78px, 10vw, 124px);
     aspect-ratio: 1;
     border-radius: 50%;
-    font-size: clamp(3rem, 7vw, 5.6rem);
-    line-height: 1;
-    background: color-mix(in srgb, var(--ac) 12%, var(--card));
-    filter: drop-shadow(0 8px 8px color-mix(in srgb, var(--ink) 15%, transparent))
+    background: color-mix(in srgb, var(--ac) 12%, var(--card))
 }
 
 #main {
@@ -3355,10 +3363,6 @@ a:focus {
     .dashboard-links .btn {
         padding: 5px 8px;
         font-size: .68rem
-    }
-    .dashboard-mascot {
-        width: 68px;
-        font-size: 3rem
     }
     .dashboard-kpi {
         grid-column: span 6
@@ -6985,5 +6989,309 @@ html[data-theme=dark] .landing-page {
 @media(prefers-reduced-motion:reduce) {
     .landing-nav-indicator {
         transition: none
+    }
+}
+
+/* Keep public screens on the system's light neumorphic palette. */
+#landing {
+    --bg: #ddd9cc;
+    --card: #f3f1e9;
+    --sd: #c5c1b4;
+    --sl: #fff;
+    --ink: #34372f;
+    --mut: #777968;
+    --ac: #23aaa3;
+    --g: linear-gradient(135deg, #6db3b7, #23aaa3);
+    color-scheme: light
+}
+
+#landing.landing-page {
+    color: var(--ink);
+    background: var(--bg)
+}
+
+#landing .landing-hero {
+    color: var(--ink);
+    border-color: #fff;
+    background: var(--card);
+    box-shadow: 8px 8px 18px var(--sd), -8px -8px 18px var(--sl)
+}
+
+#landing .landing-hero-content,
+#landing .landing-hero h1,
+#landing .landing-pick-heading h2,
+#landing .landing-section-heading h2,
+#landing .landing-feature-heading h2,
+#landing .landing-faq-heading h2,
+#landing .landing-story-band h2,
+#landing .landing-stay-copy h3 {
+    color: var(--ink)
+}
+
+#landing .landing-hero h1 em,
+#landing .landing-pick-heading h2 em,
+#landing .landing-section-heading h2 em,
+#landing .landing-feature-heading h2 em,
+#landing .landing-faq-heading h2 em,
+#landing .landing-story-band h2 em {
+    color: #168f89
+}
+
+#landing .landing-hero-content>p,
+#landing .landing-eyebrow,
+#landing .landing-location,
+#landing .landing-pick-heading .landing-carousel-controls,
+#landing .landing-stay-copy p,
+#landing .landing-feature-card>p,
+#landing .landing-faq-heading>p,
+#landing .landing-faq-list details p {
+    color: var(--mut)
+}
+
+#landing .landing-nav {
+    border-color: #fff;
+    background: rgba(243, 241, 233, .96);
+    box-shadow: 8px 8px 18px var(--sd), -8px -8px 18px var(--sl);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px)
+}
+
+#landing .landing-nav .landing-brand,
+#landing .landing-nav .landing-brand>span:last-child,
+#landing .landing-nav .landing-brand>span:last-child>b {
+    color: var(--ink)
+}
+
+#landing .landing-nav .landing-brand>span:last-child>span,
+#landing .landing-nav .landing-login,
+#landing .landing-nav-links a {
+    color: var(--mut)
+}
+
+#landing .landing-nav .landing-brand-mark {
+    background: #23aaa3;
+    box-shadow: 3px 3px 8px var(--sd), -3px -3px 8px var(--sl)
+}
+
+#landing .landing-nav-links {
+    border-color: #d2cfc4;
+    background: #ebe9e0
+}
+
+#landing .landing-nav-indicator,
+#landing .landing-nav-links a:hover,
+#landing .landing-nav-links a.is-current {
+    color: var(--ink);
+    background: var(--card);
+    box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl)
+}
+
+#landing .landing-nav-cta,
+#landing .landing-primary {
+    color: #fff;
+    background: var(--g);
+    box-shadow: none
+}
+
+#landing .landing-stay-section,
+#landing .landing-story-band {
+    border-color: #fff;
+    background: #ebe9e0;
+    box-shadow: 8px 8px 18px var(--sd), -8px -8px 18px var(--sl)
+}
+
+#landing .landing-stay-card,
+#landing .landing-feature-card {
+    border-color: #fff;
+    background: var(--card);
+    box-shadow: 5px 5px 12px var(--sd), -4px -4px 10px var(--sl)
+}
+
+#landing .landing-feature-card>b,
+#landing .landing-feature-card>span,
+#landing .landing-faq-list summary {
+    color: var(--ink)
+}
+
+#landing .landing-feature-card:hover,
+#landing .landing-stay-card:hover {
+    box-shadow: inset 3px 3px 7px var(--sd), inset -3px -3px 7px var(--sl)
+}
+
+#landing .landing-experience {
+    color: #fff;
+    border-color: rgba(255, 255, 255, .4);
+    background: var(--g);
+    box-shadow: none
+}
+
+#landing .landing-experience h2,
+#landing .landing-experience h2 em,
+#landing .landing-experience p {
+    color: #fff
+}
+
+#landing .landing-final-cta h2 {
+    max-width: 100%;
+    overflow-wrap: anywhere
+}
+
+@media(max-width:760px) {
+    #landing .landing-final-cta h2 {
+        font-size: clamp(1.8rem, 8vw, 3rem)
+    }
+}
+
+#landing .landing-faq-list,
+#landing .landing-faq-list details {
+    border-color: #c5c1b4
+}
+
+#landing .landing-faq-list summary span,
+#landing .landing-pick-heading .landing-carousel-controls button {
+    color: #168f89;
+    border-color: #fff;
+    background: var(--card);
+    box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl)
+}
+
+html[data-theme=dark]:has(#landing:not(.hidden)) body,
+html[data-theme=dark]:has(#auth:not(.hidden)) body {
+    --bg: #ddd9cc;
+    --card: #f3f1e9;
+    --sd: #c5c1b4;
+    --sl: #fff;
+    --ink: #34372f;
+    --mut: #777968;
+    color-scheme: light;
+    color: var(--ink);
+    background: var(--bg)
+}
+
+html[data-theme=dark] #auth.auth-shell {
+    color-scheme: light
+}
+
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal {
+    --bg: #f3f1e9;
+    --card: #f3f1e9;
+    --sd: #c5c1b4;
+    --sl: #fff;
+    --ink: #34372f;
+    --mut: #777968;
+    --ac: #23aaa3;
+    color-scheme: light;
+    color: var(--ink);
+    background: var(--card);
+    border-color: #d5d1c5
+}
+
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-links a,
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-links button,
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-brand,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-links a,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-links button,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-brand {
+    color: var(--ink)
+}
+
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-links a:hover,
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-links button:hover,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-links a:hover,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-links button:hover {
+    color: #168f89
+}
+
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-heading,
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-caption,
+html[data-theme=dark]:has(#landing:not(.hidden)) .site-legal-bottom,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-heading,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-caption,
+html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-bottom {
+    color: var(--mut)
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.wrap {
+    width: 100%;
+    margin: 0 auto;
+    flex: 1 0 auto;
+}
+
+.site-legal {
+    margin-top: auto;
+}
+
+.landing-page h1 em,
+.landing-page h2 em {
+    background: transparent;
+    border-radius: 0;
+    font-size: inherit;
+    font-style: italic;
+    margin-left: 0;
+    padding: 0;
+}
+
+@media(max-width:1024px) {
+    .shell {
+        grid-template-columns: 1fr;
+    }
+
+    .wrap {
+        padding-bottom: calc(92px + env(safe-area-inset-bottom));
+    }
+
+    .side,
+    .side-collapsed .side {
+        position: fixed;
+        z-index: 1000;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        overflow: hidden;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .sidebrand,
+    .side-toggle,
+    .sideclock,
+    .side-collapsed .sideclock {
+        display: none !important;
+    }
+
+    .snav,
+    .side-collapsed .snav {
+        display: flex !important;
+        flex: 1 1 auto;
+        flex-direction: row;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 0;
+    }
+
+    .snav a {
+        flex: 0 0 66px;
+        min-width: 66px;
+        padding: 7px 4px;
+    }
+
+    #who {
+        display: block;
+        max-width: 28vw;
+        overflow: hidden;
+        font-size: .64rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }

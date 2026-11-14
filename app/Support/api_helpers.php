@@ -3,7 +3,7 @@ const ACTIVE="('Pending','Confirmed','Checked-In')";
 function out($d,$c=200){throw new \Illuminate\Http\Exceptions\HttpResponseException(response()->json($d,$c));}
 function q($sql,$p=[]){return \App\Models\ResortData::query($sql,$p);}
 function notify($uid,$title,$message,$type='booking',$rid=null){q("INSERT INTO notifications(user_id,title,message,notification_type,reservation_id) VALUES(?,?,?,?,?)",[$uid,$title,$message,$type,$rid]);}
-function audit($action,$details){$u=$_SESSION['u']??null;if($u&&$u['user_role']=='Admin')q("INSERT INTO admin_activity(user_id,action,details) VALUES(?,?,?)",[$u['user_id'],$action,clean($details,500)]);}
+function audit($action,$details){$u=$_SESSION['u']??null;if($u)q("INSERT INTO admin_activity(user_id,action,details) VALUES(?,?,?)",[$u['user_id'],$action,clean($details,500)]);}
 function userPhotoColumn(){static $col=null;if($col!==null)return $col;$cols=q("SHOW COLUMNS FROM users")->fetchAll();$names=array_column($cols,'Field');if(in_array('profile_photo',$names,true))return $col='profile_photo';if(in_array('photo',$names,true))return $col='photo';out(['error'=>'Profile photo column is missing. Run profile_update.sql.'],500);}
 function need(...$r){$u=$_SESSION['u']??null;if(!$u||($r&&!in_array($u['user_role'],$r)))out(['error'=>'Not allowed'],403);if($u['user_role']=='Guest'&&!q("SELECT is_active FROM users WHERE user_id=?",[$u['user_id']])->fetchColumn()){session_destroy();out(['error'=>'This account is inactive. Contact the resort administrator.'],403);}return $u;}
 function clean($s,$n=100){return mb_substr(trim(strip_tags((string)$s)),0,$n);}

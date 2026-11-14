@@ -2,6 +2,11 @@
 USE mnb_resort;
 ALTER TABLE accommodations ADD COLUMN IF NOT EXISTS is_archived TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE messages ADD COLUMN IF NOT EXISTS is_archived TINYINT(1) NOT NULL DEFAULT 0;
+SET @messages_index_exists := (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name='messages' AND index_name='idx_messages_thread_archived_id');
+SET @messages_index_sql := IF(@messages_index_exists=0,'ALTER TABLE messages ADD INDEX idx_messages_thread_archived_id(thread_id,is_archived,message_id)','SELECT 1');
+PREPARE messages_index_stmt FROM @messages_index_sql;
+EXECUTE messages_index_stmt;
+DEALLOCATE PREPARE messages_index_stmt;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS address VARCHAR(255) NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE NULL;
 ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status ENUM('Unpaid','Partial','Paid') NOT NULL DEFAULT 'Unpaid';
