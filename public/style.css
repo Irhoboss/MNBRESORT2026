@@ -7211,3 +7211,87 @@ html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-caption,
 html[data-theme=dark]:has(#auth:not(.hidden)) .site-legal-bottom {
     color: var(--mut)
 }
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.wrap {
+    width: 100%;
+    margin: 0 auto;
+    flex: 1 0 auto;
+}
+
+.site-legal {
+    margin-top: auto;
+}
+
+.landing-page h1 em,
+.landing-page h2 em {
+    background: transparent;
+    border-radius: 0;
+    font-size: inherit;
+    font-style: italic;
+    margin-left: 0;
+    padding: 0;
+}
+
+@media(max-width:1024px) {
+    .shell {
+        grid-template-columns: 1fr;
+    }
+
+    .wrap {
+        padding-bottom: calc(92px + env(safe-area-inset-bottom));
+    }
+
+    .side,
+    .side-collapsed .side {
+        position: fixed;
+        z-index: 1000;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        overflow: hidden;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .sidebrand,
+    .side-toggle,
+    .sideclock,
+    .side-collapsed .sideclock {
+        display: none !important;
+    }
+
+    .snav,
+    .side-collapsed .snav {
+        display: flex !important;
+        flex: 1 1 auto;
+        flex-direction: row;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 0;
+    }
+
+    .snav a {
+        flex: 0 0 66px;
+        min-width: 66px;
+        padding: 7px 4px;
+    }
+
+    #who {
+        display: block;
+        max-width: 28vw;
+        overflow: hidden;
+        font-size: .64rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
