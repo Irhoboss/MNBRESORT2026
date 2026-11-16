@@ -145,8 +145,8 @@
                 </div>
             </section>
             <section class="auth-content col-lg-5">
-            <button class="auth-back" type="button" onclick="closeAuth()">← Back to the resort</button>
             <div class="auth-main">
+                <button class="auth-back" type="button" onclick="closeAuth()">← Back to the resort</button>
                 <div class="auth-heading"><span class="auth-kicker">WELCOME TO MNB RESORT</span><h2 id="authTitle">Welcome back</h2><p class="mut" id="authSubtitle">Log in to plan your next escape.</p></div>
                 <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
                 </div>

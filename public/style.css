@@ -76,39 +76,44 @@ html[data-theme=dark] #auth #otpPanel .otp-submit {
 }
 
 
-/* Reviews and QR check-in stay high contrast in dark theme. */
-
-/* Reviews stay high contrast in dark theme. */
-html[data-theme=dark] #main:has(.review)>.n,
-html[data-theme=dark] #main:has(.review) .review,
+/* Keep review text legible while retaining the application's dark neumorphic palette. */
 html[data-theme=dark] #main:has(.review) {
-    --bg: #f1f0e9;
-    --card: #fbfaf5;
-    --sd: #d5d3c9;
-    --sl: #fff;
-    --ink: #34372f;
-    --mut: #6d7065;
-    color: #34372f;
-    background: #fbfaf5
+    --bg: #171c24;
+    --card: #202833;
+    --sd: #10151c;
+    --sl: #2c3743;
+    --ink: #edf3f1;
+    --mut: #b1c0bc;
+    --ac: #55c4b7;
+}
+
+html[data-theme=dark] #main:has(.review) > .n {
+    color: var(--ink);
+    background: var(--card);
+    box-shadow: 8px 8px 18px var(--sd), -8px -8px 18px var(--sl);
 }
 
 html[data-theme=dark] #main:has(.review) .review {
-    border-color: #d5d3c9
+    color: var(--ink);
+    border: 1px solid #35414b;
+    border-radius: 14px;
+    background: #1b222c;
+    box-shadow: inset 3px 3px 8px #111820, inset -3px -3px 8px #27323c;
 }
 
 html[data-theme=dark] #main:has(.review) .review p,
 html[data-theme=dark] #main:has(.review) .review small,
 html[data-theme=dark] #main:has(.review) .mut,
 html[data-theme=dark] #main:has(.review) label {
-    color: #555b52
+    color: var(--mut);
 }
 
 html[data-theme=dark] #main:has(.review) input,
 html[data-theme=dark] #main:has(.review) select,
 html[data-theme=dark] #main:has(.review) textarea {
-    color: #34372f;
-    background: #fff;
-    box-shadow: inset 3px 3px 7px #d5d3c9, inset -3px -3px 7px #fff
+    color: var(--ink);
+    background: #202833;
+    box-shadow: inset 3px 3px 7px #10151c, inset -3px -3px 7px #2c3743;
 }
 
 html[data-theme=dark] .modal.checkin-modal .mbox {
@@ -1080,8 +1085,12 @@ textarea {
     align-items: center;
     justify-content: center;
     gap: 3px;
-    background: rgba(108, 99, 255, calc(.05 + var(--p)*.5));
+    background: rgba(35, 170, 163, var(--booking-alpha, .08));
     cursor: pointer
+}
+
+html[data-theme=dark] .day:not(.empty) {
+    background: rgba(85, 196, 183, var(--booking-alpha, .08));
 }
 
 .day:hover:not(.empty) {
@@ -1966,12 +1975,57 @@ textarea {
 }
 
 .modal .mbox {
+    --bg: #f1f0e9;
+    --card: #fbfaf5;
+    --sd: #d5d3c9;
+    --sl: #fff;
+    --ink: #34372f;
+    --mut: #62665d;
+    --ac: #168f89;
+    --g: linear-gradient(135deg, #55b9b2, #168f89);
+    color-scheme: light;
     border: 1px solid rgba(255, 255, 255, .72);
-    background: rgba(245, 244, 237, .93);
+    background: rgba(251, 250, 245, .97);
     color: var(--ink);
-    box-shadow: none !important;
+    box-shadow: 10px 10px 26px rgba(10, 15, 24, .24), -5px -5px 16px rgba(255, 255, 255, .12) !important;
     -webkit-backdrop-filter: blur(22px);
     backdrop-filter: blur(22px);
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    line-height: 1.5;
+}
+
+.modal .mbox h3 {
+    width: 100%;
+    color: #26332f;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.modal .mbox p {
+    color: #454b44;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.modal .mbox > label {
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+    color: #555b52;
+    font-size: .82rem;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.modal .mbox > label input,
+.modal .mbox > label select,
+.modal .mbox > label textarea {
+    width: 100%;
+    min-width: 0;
+    color: #34372f;
+    background: #fbfaf5;
+    box-shadow: inset 4px 4px 8px #d5d3c9, inset -4px -4px 8px #fff;
 }
 
 .modal {
@@ -3188,6 +3242,34 @@ a:focus {
     min-width: 0
 }
 
+.availability-page .inventory-heading > div:first-child {
+    min-width: 0;
+    flex: 1 1 280px;
+}
+
+.availability-page .inventory-heading h2 {
+    line-height: 1.25;
+}
+
+.availability-page .inventory-heading p {
+    max-width: 58ch;
+    line-height: 1.55;
+}
+
+.calnav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 auto;
+}
+
+.calnav .btn {
+    flex: 0 0 40px;
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
+}
+
 .availability-summary {
     display: flex;
     justify-content: space-between;
@@ -3211,6 +3293,11 @@ a:focus {
     height: 10px;
     border-radius: 50%;
     background: var(--ac)
+}
+
+.availability-summary,
+.availability-summary > span {
+    line-height: 1.45;
 }
 
 .checkout-alert {
@@ -8355,5 +8442,385 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         padding: 0 10px;
         font-size: .7rem;
         white-space: nowrap
+    }
+}
+
+/* Keep the auth return action in the form flow so it never covers the heading. */
+#auth .auth-main .auth-back {
+    position: static;
+    align-self: flex-start;
+    min-height: 40px;
+    margin: 0 0 4px;
+    padding: 0 14px;
+    font-size: .8rem;
+}
+
+.report-shell {
+    border: 1px solid color-mix(in srgb, var(--mut) 10%, transparent);
+}
+
+.report-heading > div:first-child {
+    min-width: 0;
+}
+
+.report-heading h1 {
+    margin: 4px 0 6px;
+    font-size: clamp(1.55rem, 3vw, 2rem);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.report-heading p {
+    max-width: 58ch;
+    line-height: 1.55;
+}
+
+.report-toolbar {
+    gap: 10px;
+}
+
+.report-toolbar label {
+    gap: 7px;
+    line-height: 1.35;
+}
+
+.report-toolbar select,
+.report-toolbar input,
+.report-toolbar .btn {
+    min-height: 40px;
+}
+
+.review {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 8px 16px;
+    padding: 18px 0;
+    line-height: 1.55;
+}
+
+.review > b {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.review > .stars {
+    float: none;
+    white-space: nowrap;
+}
+
+.review > p,
+.review > small,
+.review > .row {
+    grid-column: 1 / -1;
+}
+
+.review > p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.review > .row {
+    align-items: center;
+    margin: 4px 0 0;
+}
+
+@media(max-width:700px) {
+    .report-shell {
+        padding: clamp(14px, 4vw, 20px);
+    }
+
+    .report-heading {
+        gap: 16px;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .report-toolbar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+    }
+
+    .report-toolbar label {
+        min-width: 0;
+    }
+
+    .report-toolbar select,
+    .report-toolbar input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .report-toolbar > .btn {
+        align-self: end;
+        width: 100%;
+        min-height: 40px;
+    }
+
+    .report-exports {
+        grid-column: 1 / -1;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .report-exports .btn {
+        min-height: 40px;
+        flex: 1 1 0;
+    }
+
+    #auth .auth-content {
+        padding: 24px clamp(18px, 6vw, 28px) 32px;
+    }
+
+    #auth .auth-main .auth-back {
+        top: auto;
+        right: auto;
+        left: auto;
+        margin-bottom: 4px;
+        white-space: normal;
+    }
+}
+
+@media(max-width:380px) {
+    .report-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .report-toolbar > .btn,
+    .report-exports {
+        grid-column: 1;
+    }
+
+    .review {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .review > .stars,
+    .review > p,
+    .review > small,
+    .review > .row {
+        grid-column: 1;
+    }
+}
+
+@media(max-width:700px) {
+    .payment-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .payment-header h2,
+    .payment-header select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #main .admin-table {
+        display: block;
+        min-width: 0;
+        font-size: .88rem;
+    }
+
+    #main .admin-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    #main .admin-table tbody {
+        display: grid;
+        gap: 12px;
+    }
+
+    #main .admin-table tbody tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 7px 14px;
+        border: 1px solid color-mix(in srgb, var(--mut) 16%, transparent);
+        border-radius: 16px;
+        background: var(--card);
+        box-shadow: 5px 5px 12px var(--sd), -4px -4px 12px var(--sl);
+    }
+
+    #main .admin-table td {
+        display: grid;
+        grid-template-columns: minmax(104px, .7fr) minmax(0, 1.3fr);
+        align-items: start;
+        gap: 8px;
+        min-width: 0;
+        padding: 10px 0;
+        overflow-wrap: anywhere;
+    }
+
+    #main .admin-table td::before {
+        content: attr(data-label);
+        color: var(--mut);
+        font-size: .76rem;
+        font-weight: 650;
+        line-height: 1.4;
+    }
+
+    #main .admin-table td.acts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #main .admin-table td.acts::before {
+        flex: 1 0 100%;
+    }
+
+    #main .admin-table td[colspan] {
+        display: block;
+        line-height: 1.5;
+    }
+
+    #main .admin-table td[colspan]::before {
+        content: none;
+    }
+
+    .availability-page {
+        padding: clamp(14px, 4vw, 20px);
+    }
+
+    .availability-page .inventory-heading {
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .availability-page .calnav {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .availability-page .calnav input {
+        width: min(100%, 180px);
+        min-width: 110px !important;
+        flex: 0 1 180px;
+    }
+
+    .availability-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal {
+        align-items: center;
+        padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    }
+
+    .modal .mbox {
+        width: min(100%, 440px);
+        max-height: calc(100dvh - 24px);
+        gap: 12px;
+        padding: clamp(18px, 5vw, 24px);
+        border-radius: 22px;
+    }
+}
+
+@media(max-width:380px) {
+    #main .admin-table td {
+        grid-template-columns: minmax(82px, .65fr) minmax(0, 1.35fr);
+        gap: 6px;
+        font-size: .83rem;
+    }
+
+    #main .admin-table td::before {
+        font-size: .72rem;
+    }
+}
+
+@media(min-width:821px) and (max-width:1100px) {
+    .report-heading {
+        align-items: flex-start;
+    }
+
+    .report-heading > div:first-child {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+
+    .report-toolbar {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(88px, .55fr) minmax(190px, 1fr);
+        align-items: end;
+        justify-content: stretch;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .report-toolbar label {
+        min-width: 0;
+    }
+
+    .report-toolbar select,
+    .report-toolbar input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .report-toolbar > .btn {
+        width: 100%;
+    }
+
+    .report-exports {
+        width: 100%;
+        padding-left: 12px;
+    }
+
+    .report-exports .btn {
+        flex: 1 1 0;
+    }
+}
+
+@media(min-width:701px) and (max-width:820px) {
+    .report-heading {
+        align-items: flex-start;
+    }
+
+    .report-heading > div:first-child {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+
+    .report-toolbar {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: end;
+        justify-content: stretch;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .report-toolbar label {
+        min-width: 0;
+    }
+
+    .report-toolbar select,
+    .report-toolbar input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .report-toolbar > .btn {
+        width: 100%;
+    }
+
+    .report-exports {
+        grid-column: 2 / 4;
+        width: 100%;
+        padding-left: 12px;
+    }
+
+    .report-exports .btn {
+        flex: 1 1 0;
     }
 }
