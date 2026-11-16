@@ -134,7 +134,7 @@
     </div>
 
     <div id="auth" class="center auth-shell hidden">
-        <div class="authbox row g-0 container-fluid shadow-lg">
+        <div class="authbox row g-0 container-fluid">
             <section class="auth-visual col-lg-7">
                 <div class="auth-brand"><span class="auth-brand-mark">M</span> MNB <span>Resort</span></div>
                 <div class="auth-story">
@@ -151,7 +151,11 @@
                 <div class="tabs"><a id="tl" class="on" onclick="tab(0)">Log in</a><a id="tr" onclick="tab(1)">Register</a>
                 </div>
                 <div id="authError" class="auth-error hidden" role="alert" aria-live="assertive"></div>
-                <div id="fr" class="hidden"><input id="rn" autocomplete="name" placeholder="Full name" oninput="clearAuthError()"><input id="rph" autocomplete="tel" placeholder="Phone" oninput="clearAuthError()">
+                <div id="fr" class="hidden">
+                    <input id="ruser" autocomplete="username" maxlength="32" placeholder="Username" oninput="clearAuthError()">
+                    <input id="rfirst" autocomplete="given-name" maxlength="50" placeholder="First name" oninput="clearAuthError()">
+                    <input id="rsurname" autocomplete="family-name" maxlength="50" placeholder="Surname" oninput="clearAuthError()">
+                    <input id="rph" autocomplete="tel" maxlength="20" placeholder="Phone" oninput="clearAuthError()">
                 </div>
                 <input id="em" type="email" autocomplete="email" placeholder="Email" oninput="clearAuthError()">
                 <div class="auth-password-control">
@@ -165,6 +169,7 @@
                 <input id="authOtp" class="hidden" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit email verification code" onkeydown="event.key=='Enter'&&authGo()">
                 <button type="button" class="btn" onclick="authGo()" id="ab">Log in</button>
                 <button type="button" class="btn ghost" onclick="forgotPassword()" id="forgotBtn">Forgot password?</button>
+                <a id="googleLogin" class="btn auth-google" href="{{ route('google.redirect') }}" aria-label="Continue with Google"><span class="google-mark" aria-hidden="true">G</span>Continue with Google</a>
             </div>
 
             <div id="otpPanel" class="otp-panel hidden" aria-live="polite">
@@ -189,6 +194,12 @@
             </section>
         </div>
     </div>
+    @if (session('google_error'))
+        <span id="googleAuthError" class="hidden">{{ session('google_error') }}</span>
+    @endif
+    @if (session('google_signin'))
+        <span id="googleSignInNotice" class="hidden" data-name="{{ session('google_signin.full_name') }}" data-email="{{ session('google_signin.email') }}"></span>
+    @endif
     <div id="app" class="wrap hidden">
         <header class="n top">
             <div class="logo">MNB<span>Resort</span></div>

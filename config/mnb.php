@@ -16,4 +16,9 @@ return [
         'from_email' => env('MNB_MAIL_FROM', env('MNB_SMTP_USER', '')),
         'from_name' => env('MNB_MAIL_NAME', 'MNB Resort'),
     ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID', ''),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET', ''),
+        'redirect_uri' => env('GOOGLE_REDIRECT_URI', ''),
+    ],
 ];
