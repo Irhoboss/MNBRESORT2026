@@ -131,6 +131,42 @@
                 <details><summary>Can I contact the resort about my stay?<span>+</span></summary><p>Log in and use Messages to coordinate details with resort staff.</p></details>
             </div>
         </section>
+        <footer class="site-legal landing-footer">
+            <div class="site-legal-inner">
+                <div class="site-legal-intro">
+                    <a class="site-legal-brand" href="#home" aria-label="MNB Resort home"><span class="site-legal-mark" aria-hidden="true">M</span><span>MNB <span class="site-legal-brand-light">Resort</span></span></a>
+                    <p class="site-legal-caption">Your coastal escape in Papaya, Nasugbu. Slow down, make memories, and enjoy a little more time by the sea.</p>
+                </div>
+                <nav class="site-legal-links" aria-label="Footer navigation">
+                    <div class="site-legal-group">
+                        <span class="site-legal-heading">NAVIGATE</span>
+                        <a href="#home">Home</a>
+                        <a href="#stay">Stays</a>
+                        <a href="#experiences">Explore</a>
+                        <a href="#experience">About us</a>
+                        <a href="#questions">FAQs</a>
+                    </div>
+                    <div class="site-legal-group">
+                        <span class="site-legal-heading">MY ACCOUNT</span>
+                        <button type="button" onclick="openAuth(0)">Sign in</button>
+                        <button type="button" onclick="openAuth(1)">Create account</button>
+                        <a href="{{ route('privacy') }}">Privacy policy</a>
+                        <a href="{{ route('terms') }}">Terms of service</a>
+                    </div>
+                    <div class="site-legal-group site-legal-contact">
+                        <span class="site-legal-heading">GET IN TOUCH</span>
+                        <a class="site-legal-location" href="https://maps.google.com/?q=MNB+Resort+Papaya+Nasugbu+Batangas" target="_blank" rel="noopener">
+                            <span aria-hidden="true">⌖</span><span>MNB Resort<br>Papaya, Nasugbu, Batangas</span>
+                        </a>
+                        <p>Questions about your stay? Sign in to contact our resort staff about your booking.</p>
+                        <button class="site-legal-contact-link" type="button" onclick="openAuth(0)">Sign in to contact resort staff <span aria-hidden="true">→</span></button>
+                        <a class="site-legal-contact-link" href="{{ route('refund-policy') }}">Booking and cancellation information <span aria-hidden="true">→</span></a>
+                        <div class="site-legal-motto"><b>MAKE ROOM TO SLOW DOWN.</b><small>Your coastal escape · MNB Resort</small></div>
+                    </div>
+                </nav>
+            </div>
+            <div class="site-legal-bottom"><span>© {{ date('Y') }} MNB Resort. All rights reserved.</span><span><a href="{{ route('cookie-policy') }}">Cookie policy</a><button type="button" id="cookie-settings">Cookie settings</button></span></div>
+        </footer>
     </div>
 
     <div id="auth" class="center auth-shell hidden">
@@ -212,32 +248,11 @@
             <aside id="side" class="side n"></aside>
             <main id="main" class="g"></main>
         </div>
+        <footer class="app-footer">
+            <span>© {{ date('Y') }} MNB Resort. All rights reserved.</span>
+            <span>Papaya, Nasugbu, Batangas · Your coastal escape.</span>
+        </footer>
     </div>
-    <footer class="site-legal">
-        <div class="site-legal-inner">
-            <div class="site-legal-intro">
-                <div class="site-legal-brand"><span class="site-legal-mark" aria-hidden="true">M</span><span>MNB <span class="site-legal-brand-light">Resort</span></span></div>
-                <p class="site-legal-caption">A little clarity for a carefree stay.</p>
-            </div>
-            <nav class="site-legal-links" aria-label="Policies and privacy settings">
-                <div class="site-legal-group">
-                    <span class="site-legal-heading">GUEST POLICIES</span>
-                    <a href="{{ route('privacy') }}">Privacy policy</a>
-                    <a href="{{ route('terms') }}">Terms of service</a>
-                </div>
-                <div class="site-legal-group">
-                    <span class="site-legal-heading">YOUR BOOKING</span>
-                    <a href="{{ route('refund-policy') }}">Refund policy</a>
-                </div>
-                <div class="site-legal-group">
-                    <span class="site-legal-heading">PRIVACY CHOICES</span>
-                    <a href="{{ route('cookie-policy') }}">Cookie policy</a>
-                    <button type="button" id="cookie-settings">Cookie settings</button>
-                </div>
-            </nav>
-        </div>
-        <div class="site-legal-bottom"><span>© {{ date('Y') }} MNB Resort. All rights reserved.</span><span>Made for your next memorable stay.</span></div>
-    </footer>
     <section id="cookie-banner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-description" hidden>
         <div class="cookie-mark" aria-hidden="true">✦</div>
         <p class="cookie-eyebrow">YOUR PRIVACY MATTERS</p>

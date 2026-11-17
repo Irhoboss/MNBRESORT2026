@@ -267,6 +267,7 @@ function scheduleBadge(delay = 5000) { clearTimeout(badgeTimer); if (!U || docum
 async function boot() {
 const r = await api('me'); if (!r.user) { const googleError=$('#googleAuthError')?.textContent.trim(), landing=$('#landing'); if (googleError) { openAuth(false); showAuthError(googleError); return } if (landing) { landing.classList.remove('hidden'); $('#auth').classList.add('hidden') } else { $('#auth').classList.remove('hidden') } if (sessionStorage.getItem('mnbSignedOut') === '1') { sessionStorage.removeItem('mnbSignedOut'); accountDialog({kind:'success',title:'Signed out',message:'You have been signed out of MNB Resort. See you soon!',actions:[{label:'Continue',primary:true,onClick:event=>event.currentTarget.closest('.account-dialog-backdrop').remove()}]}) } return }
     $('#landing')?.classList.add('hidden');
+    const cookieBanner = $('#cookie-banner'); if (cookieBanner) cookieBanner.hidden = true;
     U = r.user; UN = r.unread; $('#auth').classList.add('hidden'); $('#app').classList.remove('hidden'); $('#who').textContent = U.full_name + ' · ' + U.user_role;
     $('#tb').innerHTML = ic(dark() ? 'sun' : 'moon'); $('#mb').innerHTML = ic('chat') + '<em class="mbd" style="display:none"></em>'; $('#nb').innerHTML = ic('bell'); $('#pb').innerHTML = ic('user'); $('#lb').innerHTML = ic('out'); scheduleBadge(); await go('home'); const googleNotice=$('#googleSignInNotice'); if(googleNotice)showSignInSuccess(googleNotice.dataset.name||U.full_name,googleNotice.dataset.email||'');
 }
