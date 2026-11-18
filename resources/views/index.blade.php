@@ -222,7 +222,7 @@
                 </div>
                 <div class="otp-timer">Code expires in <span id="otpExpiresText">09:47</span></div>
                 <div class="otp-actions">
-                    <button type="button" class="btn otp-submit" onclick="authGo()">VERIFY ACCOUNT</button>
+                    <button type="button" class="btn otp-submit" id="otpVerifyButton" onclick="authGo()">VERIFY ACCOUNT</button>
                     <button type="button" class="btn otp-resend-button" id="otpResendButton" disabled onclick="resendRegisterOtp()">RESEND CODE</button>
                 </div>
                 <a href="#" class="otp-back" onclick="event.preventDefault(); returnToAuthUi();">← Back to Create Account</a>
