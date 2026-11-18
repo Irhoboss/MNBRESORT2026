@@ -765,6 +765,60 @@ th {
     min-width: 620px
 }
 
+.payment-admin-table {
+    min-width: 900px;
+    table-layout: fixed
+}
+
+.payment-admin-table col:nth-child(1) {
+    width: 13%
+}
+
+.payment-admin-table col:nth-child(2) {
+    width: 19%
+}
+
+.payment-admin-table col:nth-child(3) {
+    width: 23%
+}
+
+.payment-admin-table col:nth-child(4),
+.payment-admin-table col:nth-child(5),
+.payment-admin-table col:nth-child(6) {
+    width: 10%
+}
+
+.payment-admin-table col:nth-child(7) {
+    width: 15%
+}
+
+.payment-admin-table td.acts {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 51px;
+    padding: 10px 8px;
+}
+
+.payment-admin-table td.acts .btn {
+    min-width: 64px;
+    justify-content: center;
+}
+
+.settings-page > .settingsgrid {
+    margin-bottom: 22px
+}
+
+.settings-page > label {
+    display: flex;
+    margin-bottom: 22px
+}
+
+.settings-page > .btn {
+    display: block;
+    margin-top: 8px
+}
+
 .paymentrow {
     display: grid;
     grid-template-columns: 1.3fr 1fr 1.4fr auto;
@@ -2935,8 +2989,8 @@ a:focus {
 
 .report-exports {
     display: flex;
-    gap: 7px;
-    padding-left: 8px;
+    gap: 12px;
+    padding-left: 14px;
     border-left: 1px solid color-mix(in srgb, var(--mut) 20%, transparent)
 }
 
@@ -8567,12 +8621,15 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 }
 
 .report-toolbar {
-    gap: 10px;
+    gap: 12px;
+    width: 100%;
+    justify-content: flex-start;
 }
 
 .report-toolbar label {
     gap: 7px;
     line-height: 1.35;
+    flex: 0 1 145px;
 }
 
 .report-toolbar select,
@@ -8832,6 +8889,7 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 @media(min-width:821px) and (max-width:1100px) {
     .report-heading {
         align-items: flex-start;
+        gap: 22px;
     }
 
     .report-heading > div:first-child {
@@ -8841,11 +8899,12 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 
     .report-toolbar {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(88px, .55fr) minmax(190px, 1fr);
+        grid-template-columns: minmax(130px, 145px) minmax(120px, 140px) minmax(130px, 140px) max-content max-content;
         align-items: end;
-        justify-content: stretch;
+        justify-content: start;
         gap: 12px;
         width: 100%;
+        margin-top: 2px;
     }
 
     .report-toolbar label {
@@ -8863,7 +8922,7 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     }
 
     .report-exports {
-        width: 100%;
+        width: auto;
         padding-left: 12px;
     }
 

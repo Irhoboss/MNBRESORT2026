@@ -8,7 +8,7 @@
     <meta name="description" content="Find your next coastal getaway at MNB Resort in Papaya, Nasugbu, Batangas. Explore beachfront rooms, family stays, and cottages.">
     <script>try { document.documentElement.dataset.theme = localStorage.mnbTheme || 'light' } catch (e) { }</script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v={{ hash_file('sha256', public_path('style.css')) }}">
+    <link rel="stylesheet" href="style.css?v={{ filemtime(public_path('style.css')) }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
@@ -263,7 +263,7 @@
     </section>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-    <script src="app.js?v={{ hash_file('sha256', public_path('app.js')) }}"></script>
+    <script src="app.js?v={{ filemtime(public_path('app.js')) }}"></script>
 </body>
 
 </html>
