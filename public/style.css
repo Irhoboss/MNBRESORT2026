@@ -77,6 +77,7 @@ html[data-theme=dark] #auth #otpPanel .otp-submit {
 
 
 /* Keep review text legible while retaining the application's dark neumorphic palette. */
+
 html[data-theme=dark] #main:has(.review) {
     --bg: #171c24;
     --card: #202833;
@@ -87,7 +88,7 @@ html[data-theme=dark] #main:has(.review) {
     --ac: #55c4b7;
 }
 
-html[data-theme=dark] #main:has(.review) > .n {
+html[data-theme=dark] #main:has(.review)>.n {
     color: var(--ink);
     background: var(--card);
     box-shadow: 8px 8px 18px var(--sd), -8px -8px 18px var(--sl);
@@ -434,6 +435,33 @@ small {
     font-weight: 500
 }
 
+.side a>span {
+    display: grid;
+    place-items: center;
+    transition: transform .22s cubic-bezier(.2, .75, .25, 1), color .18s ease
+}
+
+.side a:hover>span,
+.side a:focus-visible>span {
+    color: var(--ac);
+    animation: sideIconWiggle .48s cubic-bezier(.2, .75, .25, 1)
+}
+
+@keyframes sideIconWiggle {
+    0% {
+        transform: translateX(0) rotate(0deg)
+    }
+    35% {
+        transform: translateX(3px) rotate(-5deg)
+    }
+    70% {
+        transform: translateX(-1px) rotate(3deg)
+    }
+    100% {
+        transform: translateX(0) rotate(0deg)
+    }
+}
+
 .side a.on {
     box-shadow: inset 3px 3px 7px var(--sd), inset -3px -3px 7px var(--sl);
     color: var(--ac)
@@ -731,7 +759,7 @@ th {
     white-space: nowrap
 }
 
-#admUsers td.acts .btn + .btn {
+#admUsers td.acts .btn+.btn {
     margin-left: 5px
 }
 
@@ -805,16 +833,16 @@ th {
     justify-content: center;
 }
 
-.settings-page > .settingsgrid {
+.settings-page>.settingsgrid {
     margin-bottom: 22px
 }
 
-.settings-page > label {
+.settings-page>label {
     display: flex;
     margin-bottom: 22px
 }
 
-.settings-page > .btn {
+.settings-page>.btn {
     display: block;
     margin-top: 8px
 }
@@ -857,6 +885,820 @@ th {
 
 .notification.unread {
     background: rgba(108, 99, 255, .07)
+}
+
+.notification-popover {
+    position: fixed;
+    z-index: 1200;
+    top: 72px;
+    right: 76px;
+    width: min(330px, calc(100vw - 24px));
+    max-height: 390px;
+    overflow: hidden;
+    border: 1px solid var(--sd);
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 10px 14px 34px var(--sd), -8px -8px 22px rgba(255, 255, 255, .08);
+    animation: mnbPopoverIn .18s ease-out;
+}
+
+.notification-popover header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 58px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--sd);
+    background: var(--card);
+}
+
+.notification-popover header b {
+    display: block;
+    font-size: 1.05rem;
+    letter-spacing: -.01em;
+}
+
+.notification-popover header span {
+    display: none
+}
+
+.notification-popover header button,
+.chat-widget-close,
+.chat-widget-expand {
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.notification-popover-list {
+    max-height: 270px;
+    overflow: auto
+}
+
+.notification-popover-list article {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 2px;
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--sd);
+    background: var(--card);
+}
+
+.notification-popover-list article:hover {
+    background: var(--bg);
+}
+
+.notification-popover-item-icon {
+    grid-row: 1 / span 3;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: var(--g);
+    box-shadow: 4px 5px 10px var(--sd)
+}
+
+.notification-popover-item-icon svg {
+    width: 17px;
+    height: 17px
+}
+
+.notification-popover-list article>b {
+    font-size: .88rem;
+    line-height: 1.25;
+    color: var(--ink)
+}
+
+.notification-popover-list article p {
+    margin: 3px 0 2px;
+    color: var(--mut);
+    font-size: .78rem;
+    line-height: 1.42
+}
+
+.notification-popover-list article small {
+    color: var(--mut);
+    font-size: .72rem
+}
+
+.notification-popover-view {
+    width: 100%;
+    min-height: 48px;
+    border: 0;
+    padding: 12px;
+    color: var(--ac);
+    background: var(--card);
+    font-weight: 800;
+    cursor: pointer
+}
+
+.notification-popover-view:hover {
+    background: var(--bg)
+}
+
+@keyframes mnbPopoverIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(.98)
+    }
+    to {
+        opacity: 1;
+        transform: none
+    }
+}
+
+.housekeeping-page {
+    grid-column: span 12;
+    border-radius: 22px
+}
+
+.housekeeping-room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(188px, 1fr));
+    gap: 16px
+}
+
+.housekeeping-room-card {
+    display: grid;
+    gap: 9px;
+    min-height: 158px;
+    align-content: start;
+    padding: 16px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 7px 7px 16px var(--sd), -7px -7px 16px var(--sl);
+    text-align: left;
+    color: var(--ink);
+    cursor: pointer;
+    border: 0;
+    font-family: inherit;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease
+}
+
+.housekeeping-room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 9px 9px 18px var(--sd), -9px -9px 18px var(--sl)
+}
+
+.housekeeping-room-card b {
+    font-size: .96rem
+}
+
+.housekeeping-room-card small {
+    color: var(--mut)
+}
+
+.housekeeping-status-control {
+    display: grid;
+    gap: 5px;
+    width: 100%
+}
+
+.housekeeping-status-control>span {
+    color: var(--mut);
+    font-size: .68rem;
+    font-weight: 700
+}
+
+.housekeeping-status-control select {
+    min-height: 38px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--ink);
+    font-size: .78rem;
+    cursor: pointer
+}
+
+.housekeeping-room-card .badge {
+    justify-self: start;
+    min-width: 92px;
+    text-align: center;
+    padding: 5px 10px;
+    color: var(--ink);
+    background: var(--card);
+    box-shadow: inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl)
+}
+
+.housekeeping-room-card .badge.Available,
+.housekeeping-room-card .badge.Cleaning,
+.housekeeping-room-card .badge.Under-Inspection,
+.housekeeping-room-card .badge.Occupied,
+.housekeeping-room-card .badge.Dirty,
+.housekeeping-room-card .badge.Under-Maintenance {
+    color: var(--ink)
+}
+
+.housekeeping-room-card .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: auto
+}
+
+.housekeeping-room-card .btn {
+    width: 100%;
+    min-height: 38px;
+    border-radius: 12px;
+    background: var(--g);
+    color: #fff;
+    box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl)
+}
+
+.housekeeping-room-card .btn.ghost {
+    background: var(--g);
+    color: #fff
+}
+
+#main .housekeeping-page .btn,
+#main .housekeeping-room-card .btn {
+    background: var(--g);
+    color: #fff
+}
+
+#main .housekeeping-page .btn.ghost {
+    background: var(--g);
+    color: #fff
+}
+
+#main .housekeeping-page .btn,
+#main .housekeeping-room-card .btn,
+.housekeeping-check-row select,
+.housekeeping-check-row+.btn {
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease
+}
+
+#main .housekeeping-page .btn:hover,
+#main .housekeeping-room-card .btn:hover,
+.housekeeping-check-row select:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.03)
+}
+
+#main .housekeeping-page .btn:active,
+#main .housekeeping-room-card .btn:active {
+    transform: translateY(0);
+    box-shadow: inset 3px 3px 7px var(--sd), inset -3px -3px 7px var(--sl)
+}
+
+.housekeeping-page .tw,
+.housekeeping-page table {
+    width: 100%
+}
+
+.housekeeping-page table {
+    border-spacing: 0 8px;
+    border-collapse: separate
+}
+
+.housekeeping-page th {
+    color: var(--mut);
+    font-size: .7rem;
+    font-weight: 700;
+    padding: 8px 10px
+}
+
+.housekeeping-page td {
+    background: var(--card);
+    padding: 11px 10px;
+    box-shadow: 3px 3px 8px var(--sd), -3px -3px 8px var(--sl)
+}
+
+.housekeeping-page td:first-child {
+    border-radius: 12px 0 0 12px
+}
+
+.housekeeping-page td:last-child {
+    border-radius: 0 12px 12px 0
+}
+
+.housekeeping-page .badge {
+    box-shadow: inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--sl);
+    background: var(--card)
+}
+
+.housekeeping-staff-row {
+    display: grid;
+    gap: 4px;
+    margin: 8px 0;
+    padding: 12px 14px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--card);
+    box-shadow: 5px 5px 12px var(--sd), -5px -5px 12px var(--sl)
+}
+
+.housekeeping-checklist {
+    max-height: 360px;
+    overflow: auto;
+    display: grid;
+    gap: 7px;
+    margin: 10px 0
+}
+
+.housekeeping-check-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--card);
+    box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl)
+}
+
+.housekeeping-check-row b {
+    font-size: .78rem
+}
+
+.housekeeping-check-row select {
+    width: 110px
+}
+
+.housekeeping-inspection-modal {
+    width: 100%;
+    display: grid;
+    gap: 12px
+}
+
+.housekeeping-inspection-modal>header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px
+}
+
+.housekeeping-inspection-modal>header h3 {
+    margin: 3px 0 0
+}
+
+.housekeeping-inspection-modal>label,
+.housekeeping-inspection-fields label {
+    display: grid;
+    gap: 6px;
+    color: var(--mut);
+    font-size: .78rem
+}
+
+.housekeeping-inspection-modal>label select,
+.housekeeping-inspection-fields textarea,
+.housekeeping-inspection-fields input {
+    min-height: 40px
+}
+
+.housekeeping-inspection-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px
+}
+
+.housekeeping-inspection-fields textarea {
+    min-height: 72px;
+    height: 72px
+}
+
+.housekeeping-inspection-modal>.btn {
+    justify-self: center;
+    min-width: 150px
+}
+
+.housekeeping-checklist {
+    max-height: 210px
+}
+
+.housekeeping-check-row {
+    min-height: 42px
+}
+
+.housekeeping-check-row b {
+    display: grid;
+    gap: 1px
+}
+
+.housekeeping-task-strip {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 8px 4px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ac) var(--card)
+}
+
+.housekeeping-task-card {
+    width: 230px;
+    min-width: 230px;
+    min-height: 210px;
+    display: grid;
+    align-content: start;
+    gap: 9px;
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 7px 7px 16px var(--sd), -7px -7px 16px var(--sl);
+    transition: transform .18s ease, box-shadow .18s ease
+}
+
+.housekeeping-task-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 9px 9px 18px var(--sd), -9px -9px 18px var(--sl)
+}
+
+.housekeeping-task-card h3 {
+    margin: 2px 0 0;
+    font-size: 1rem
+}
+
+.housekeeping-task-card p {
+    min-height: 36px;
+    margin: 0;
+    color: var(--mut);
+    font-size: .78rem
+}
+
+.housekeeping-task-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.housekeeping-task-card-actions {
+    margin-top: auto
+}
+
+.housekeeping-task-card-actions .row {
+    display: flex;
+    gap: 8px
+}
+
+.housekeeping-mini-status,
+.housekeeping-mini-activity {
+    display: grid;
+    gap: 8px
+}
+
+.housekeeping-mini-status button,
+.housekeeping-mini-activity article {
+    border: 0;
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 4px 4px 10px var(--sd), -4px -4px 10px var(--sl);
+    padding: 10px 12px
+}
+
+.housekeeping-mini-status button {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer
+}
+
+.housekeeping-mini-activity article {
+    display: grid;
+    gap: 3px
+}
+
+.modal .mbox:has(.housekeeping-inspection-modal) {
+    max-width: 620px;
+    width: min(620px, calc(100vw - 56px));
+    min-height: 0;
+    max-height: min(620px, calc(100dvh - 32px));
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ac) var(--card)
+}
+
+.modal .mbox:has(.housekeeping-inspection-modal)::-webkit-scrollbar {
+    width: 8px
+}
+
+.modal .mbox:has(.housekeeping-inspection-modal)::-webkit-scrollbar-track {
+    background: var(--card);
+    border-radius: 99px
+}
+
+.modal .mbox:has(.housekeeping-inspection-modal)::-webkit-scrollbar-thumb {
+    background: var(--g);
+    border-radius: 99px
+}
+
+.housekeeping-progress-modal {
+    width: min(1040px, calc(100vw - 48px));
+    min-width: 0;
+    max-width: 1040px;
+    box-sizing: border-box
+}
+.modal .mbox:has(.housekeeping-progress-modal) {
+    max-width: 1040px;
+    width: min(1040px, calc(100vw - 48px));
+    box-sizing: border-box;
+    min-height: 300px;
+    max-height: min(520px, calc(100dvh - 32px));
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: stretch;
+    text-align: left
+}
+
+.modal .mbox:has(.housekeeping-progress-modal),
+.housekeeping-progress-modal,
+.housekeeping-track {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ac) var(--card)
+}
+
+.modal .mbox:has(.housekeeping-progress-modal)::-webkit-scrollbar,
+.housekeeping-progress-modal::-webkit-scrollbar,
+.housekeeping-track::-webkit-scrollbar {
+    width: 8px;
+    height: 8px
+}
+
+.modal .mbox:has(.housekeeping-progress-modal)::-webkit-scrollbar-track,
+.housekeeping-progress-modal::-webkit-scrollbar-track,
+.housekeeping-track::-webkit-scrollbar-track {
+    background: var(--card);
+    border-radius: 99px
+}
+
+.modal .mbox:has(.housekeeping-progress-modal)::-webkit-scrollbar-thumb,
+.housekeeping-progress-modal::-webkit-scrollbar-thumb,
+.housekeeping-track::-webkit-scrollbar-thumb {
+    background: var(--g);
+    border-radius: 99px
+}
+
+.housekeeping-progress-modal>header,
+.housekeeping-progress-modal>footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px
+}
+
+.housekeeping-progress-modal>header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin-bottom: 18px;
+    padding: 8px 0 12px;
+    background: var(--card)
+}
+
+.housekeeping-progress-modal>header h3 {
+    margin: 4px 0 0
+}
+
+.housekeeping-progress-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none
+}
+.housekeeping-progress-close {
+    position: relative;
+    z-index: 30;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer
+}
+
+.housekeeping-progress-close:hover {
+    color: #fff;
+    background: var(--g)
+}
+
+.housekeeping-progress-modal>footer {
+    justify-content: flex-end;
+    margin-top: 22px
+}
+
+.housekeeping-track {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    align-items: start;
+    gap: 8px;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 8px 14px
+}
+
+.housekeeping-track:before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 4px;
+    border-radius: 99px;
+    background: var(--sd);
+    box-shadow: inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl)
+}
+
+.housekeeping-track-step {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    min-height: 150px;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 7px;
+    text-align: center;
+    color: var(--mut);
+    border-radius: 18px;
+    padding: 8px 6px;
+    background: var(--card);
+    box-shadow: 6px 6px 14px var(--sd), -6px -6px 14px var(--sl);
+    transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease
+}
+
+.housekeeping-track-step:hover {
+    transform: translateY(-3px);
+    background: var(--g);
+    color: #fff;
+    box-shadow: 9px 9px 18px var(--sd), -9px -9px 18px var(--sl)
+}
+
+.housekeeping-track-step:hover small,
+.housekeeping-track-step:hover b {
+    color: #fff
+}
+
+.housekeeping-track-step>span {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--card);
+    color: var(--mut);
+    box-shadow: 5px 5px 12px var(--sd), -5px -5px 12px var(--sl);
+    transition: transform .18s ease, background .18s ease, color .18s ease
+}
+
+.housekeeping-track-step.done>span {
+    background: var(--g);
+    color: #fff;
+    animation: housekeepingStepDone .5s ease-out
+}
+
+.housekeeping-track-step.current>span {
+    background: var(--g);
+    color: #fff;
+    transform: scale(1.08);
+    animation: housekeepingStepPulse 1.7s ease-in-out infinite
+}
+
+.housekeeping-track-step.done,
+.housekeeping-track-step.current {
+    color: var(--ink)
+}
+
+.housekeeping-track-step b {
+    font-size: .82rem
+}
+
+.housekeeping-track-step small {
+    font-size: .68rem
+}
+
+.housekeeping-track-maintenance {
+    min-height: 170px;
+    overflow-y: auto;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 7px;
+    text-align: center;
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: inset 4px 4px 10px var(--sd), inset -4px -4px 10px var(--sl)
+}
+
+.housekeeping-track-maintenance>span {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #dba85c, #b8783d);
+    animation: housekeepingMaintenanceSpin 4s linear infinite
+}
+
+@keyframes housekeepingStepDone {
+    0% {
+        transform: scale(.72);
+        opacity: .55
+    }
+    70% {
+        transform: scale(1.12)
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1
+    }
+}
+
+@keyframes housekeepingStepPulse {
+    0%,
+    100% {
+        box-shadow: 5px 5px 12px var(--sd), -5px -5px 12px var(--sl), 0 0 0 0 rgba(35, 170, 163, .32)
+    }
+    55% {
+        box-shadow: 5px 5px 12px var(--sd), -5px -5px 12px var(--sl), 0 0 0 9px rgba(35, 170, 163, 0)
+    }
+}
+
+@keyframes housekeepingMaintenanceSpin {
+    0%,
+    70%,
+    100% {
+        transform: rotate(0deg)
+    }
+    85% {
+        transform: rotate(18deg)
+    }
+}
+
+@media (max-width: 900px) {
+    .housekeeping-progress-modal {
+        width: calc(100vw - 32px);
+        max-width: 680px;
+        min-width: calc(100vw - 32px)
+    }
+    .housekeeping-track {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px
+    }
+    .housekeeping-track:before {
+        display: none
+    }
+    .housekeeping-track-step {
+        min-height: 150px
+    }
+}
+
+@media (max-width: 520px) {
+    .housekeeping-progress-modal {
+        width: calc(100vw - 24px);
+        max-width: none;
+        min-width: calc(100vw - 24px)
+    }
+    .modal .mbox:has(.housekeeping-inspection-modal) {
+        width: calc(100vw - 24px);
+        max-width: none
+    }
+    .housekeeping-inspection-fields {
+        grid-template-columns: 1fr
+    }
+    .housekeeping-track {
+        grid-template-columns: 1fr
+    }
+    .housekeeping-track-step {
+        min-height: 126px
+    }
+}
+
+@media (max-width: 600px) {
+    .notification-popover {
+        top: 68px;
+        right: 12px;
+        width: calc(100vw - 24px);
+        max-height: calc(100vh - 96px);
+    }
+    .notification-popover-list {
+        max-height: calc(100vh - 218px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .side a>span,
+    .side a:hover>span,
+    .side a:focus-visible>span {
+        animation: none;
+        transition: none;
+    }
 }
 
 .announceform {
@@ -1305,6 +2147,226 @@ html[data-theme=dark] .day:not(.empty) {
     padding: 14px 16px
 }
 
+.chat-widget {
+    position: fixed;
+    z-index: 1150;
+    right: 22px;
+    bottom: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.chat-widget-launcher {
+    width: 52px;
+    height: 52px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--g);
+    color: #fff;
+    box-shadow: 0 12px 28px rgba(35, 170, 163, .32);
+    cursor: pointer;
+    position: relative;
+    display: grid;
+    place-items: center
+}
+
+.chat-widget-launcher span {
+    display: grid;
+    place-items: center
+}
+
+.chat-widget-launcher em {
+    position: absolute;
+    top: -4px;
+    right: -2px;
+}
+
+.chat-widget-panel {
+    width: 340px;
+    height: 470px;
+    border: 1px solid rgba(127, 127, 127, .18);
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: 0 18px 44px rgba(25, 35, 40, .24);
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    animation: mnbPopoverIn .18s ease-out;
+}
+
+.chat-widget.expanded .chat-widget-panel {
+    width: min(620px, calc(100vw - 44px));
+    height: min(680px, calc(100vh - 110px));
+}
+
+.chat-widget-header {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px 10px 16px;
+    border-bottom: 1px solid var(--sd);
+}
+
+.chat-widget-header span,
+.chat-widget-header b {
+    display: block
+}
+
+.chat-widget-eyebrow {
+    color: var(--ac);
+    font-size: .62rem;
+    letter-spacing: .12em
+}
+
+.chat-widget-actions {
+    display: flex;
+    align-items: center
+}
+
+.chat-widget-expand,
+.chat-widget-close {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem
+}
+
+.chat-widget-threads {
+    max-height: 112px;
+    overflow: auto;
+    display: flex;
+    border-bottom: 1px solid var(--sd);
+}
+
+.chat-widget-threads:empty {
+    display: none
+}
+
+.chat-widget-threads>button {
+    min-width: 145px;
+    border: 0;
+    border-right: 1px solid var(--sd);
+    background: transparent;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    text-align: left;
+}
+
+.chat-widget-threads>button.on {
+    background: var(--bg);
+    color: var(--ac)
+}
+
+.chat-widget-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--g);
+    color: #fff;
+    overflow: hidden;
+    flex: none
+}
+
+.chat-widget-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.chat-widget-threads button span:last-child {
+    min-width: 0
+}
+
+.chat-widget-threads b,
+.chat-widget-threads small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.chat-widget-messages {
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chat-widget-bubble {
+    max-width: 78%;
+    align-self: flex-start;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.chat-widget-bubble>img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover
+}
+
+.chat-widget-bubble>div {
+    border-radius: 14px 14px 14px 4px;
+    background: var(--bg);
+    padding: 8px 10px;
+    box-shadow: 2px 2px 6px var(--sd);
+}
+
+.chat-widget-bubble.me {
+    align-self: flex-end
+}
+
+.chat-widget-bubble.me>div {
+    border-radius: 14px 14px 4px 14px;
+    background: var(--g);
+    color: #fff
+}
+
+.chat-widget-bubble small {
+    display: block;
+    margin-top: 4px;
+    font-size: .62rem;
+    opacity: .7;
+    text-align: right
+}
+
+.chat-widget-compose {
+    display: flex;
+    gap: 8px;
+    padding: 9px;
+    border-top: 1px solid var(--sd)
+}
+
+.chat-widget-compose input {
+    box-sizing: border-box;
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    margin: 0
+}
+
+.chat-widget-compose button {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--g);
+    color: #fff;
+    display: grid;
+    place-items: center
+}
+
 .bub {
     max-width: 75%;
     min-width: 78px;
@@ -1337,6 +2399,35 @@ html[data-theme=dark] .day:not(.empty) {
     font-size: .62rem;
     font-style: normal;
     opacity: .8
+}
+
+.av img,
+.threadrow .av img,
+.chh .av img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit
+}
+
+.bub-sender {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px
+}
+
+.bub-sender img,
+.bub-sender b {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: grid;
+    place-items: center;
+    background: var(--g);
+    color: #fff;
+    font-size: .68rem
 }
 
 .rd {
@@ -2094,6 +3185,60 @@ html[data-theme=dark] .day:not(.empty) {
     line-height: 1.5;
 }
 
+html[data-theme=dark] .modal .mbox:has(.housekeeping-progress-modal) {
+    --bg: #161927;
+    --card: #1c2030;
+    --sd: #0c0e17;
+    --sl: #272c40;
+    --ink: #e8ebf8;
+    --mut: #a9b1c9;
+    --ac: #55c8c1;
+    --g: linear-gradient(135deg, #55b9b2, #168f89);
+    color-scheme: dark;
+    background: rgba(28, 32, 48, .98);
+    border-color: rgba(39, 44, 64, .92);
+    color: var(--ink);
+}
+
+html[data-theme=dark] .modal .mbox:has(.housekeeping-progress-modal) h3,
+html[data-theme=dark] .modal .mbox:has(.housekeeping-progress-modal) .badge,
+html[data-theme=dark] .housekeeping-track-step.done,
+html[data-theme=dark] .housekeeping-track-step.current {
+    color: var(--ink)
+}
+
+html[data-theme=dark] .modal .mbox:has(.housekeeping-progress-modal) .housekeeping-track-step,
+html[data-theme=dark] .modal .mbox:has(.housekeeping-progress-modal) .housekeeping-track-maintenance,
+html[data-theme=dark] .modal .mbox:has(.housekeeping-progress-modal) .housekeeping-progress-close {
+    color: var(--ink);
+    background: var(--card)
+}
+
+html[data-theme=dark] .housekeeping-track-step small,
+html[data-theme=dark] .housekeeping-track-maintenance small {
+    color: var(--mut)
+}
+
+html[data-theme=dark] .modal .mbox:has(.housekeeping-inspection-modal) {
+    --bg: #161927;
+    --card: #1c2030;
+    --sd: #0c0e17;
+    --sl: #272c40;
+    --ink: #e8ebf8;
+    --mut: #a9b1c9;
+    --ac: #55c8c1;
+    --g: linear-gradient(135deg, #55b9b2, #168f89);
+    color-scheme: dark;
+    background: rgba(28, 32, 48, .98);
+    color: var(--ink);
+}
+
+html[data-theme=dark] .modal .mbox:has(.housekeeping-inspection-modal) h3,
+html[data-theme=dark] .modal .mbox:has(.housekeeping-inspection-modal) textarea,
+html[data-theme=dark] .modal .mbox:has(.housekeeping-inspection-modal) select {
+    color: var(--ink)
+}
+
 .modal .mbox h3 {
     width: 100%;
     color: #26332f;
@@ -2107,7 +3252,7 @@ html[data-theme=dark] .day:not(.empty) {
     overflow-wrap: anywhere;
 }
 
-.modal .mbox > label {
+.modal .mbox>label {
     width: 100%;
     min-width: 0;
     align-items: flex-start;
@@ -2117,9 +3262,9 @@ html[data-theme=dark] .day:not(.empty) {
     line-height: 1.4;
 }
 
-.modal .mbox > label input,
-.modal .mbox > label select,
-.modal .mbox > label textarea {
+.modal .mbox>label input,
+.modal .mbox>label select,
+.modal .mbox>label textarea {
     width: 100%;
     min-width: 0;
     color: #34372f;
@@ -3341,7 +4486,7 @@ a:focus {
     min-width: 0
 }
 
-.availability-page .inventory-heading > div:first-child {
+.availability-page .inventory-heading>div:first-child {
     min-width: 0;
     flex: 1 1 280px;
 }
@@ -3395,7 +4540,7 @@ a:focus {
 }
 
 .availability-summary,
-.availability-summary > span {
+.availability-summary>span {
     line-height: 1.45;
 }
 
@@ -3511,12 +4656,10 @@ html[data-theme=dark] .checkout-alert {
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 10px
     }
-
     .checkout-alert-list {
         grid-column: 1 / -1;
         grid-row: 2
     }
-
     .checkout-alert-dashboard>.btn {
         grid-column: 2;
         grid-row: 1
@@ -3527,14 +4670,12 @@ html[data-theme=dark] .checkout-alert {
     .checkout-alert-dashboard {
         grid-template-columns: minmax(0, 1fr)
     }
-
     .checkout-alert-dashboard>.btn {
         grid-column: 1;
         grid-row: auto;
         width: 100%;
         margin: 0
     }
-
     .checkout-alert-list {
         grid-template-columns: minmax(0, 1fr)
     }
@@ -5910,7 +7051,6 @@ html[data-theme=dark] .legal-content a {
         transform: scaleX(.08);
         opacity: .85
     }
-
     to {
         transform: scaleX(1);
         opacity: 1
@@ -7113,14 +8253,41 @@ html[data-theme=dark] .landing-page {
     }
 }
 
+
 /* Keep the login photograph visible as a compact header on phones and tablets. */
+
 @media(max-width:991.98px) {
-    #auth .authbox { display:flex; flex-direction:column; min-height:100svh }
-    #auth .auth-visual { display:flex; width:100%; flex:0 0 auto; min-height:clamp(190px,30svh,270px); height:auto; padding:18px 24px; background-position:center 54% }
-    #auth .auth-story { max-width:520px }
-    #auth .auth-story h1 { font-size:clamp(1.55rem,6vw,2.45rem); line-height:1.02 }
-    #auth .auth-story p { max-width:390px; margin:8px 0; font-size:.8rem; line-height:1.5 }
-    #auth .auth-content { width:100%; flex-basis:100% }
+    #auth .authbox {
+        display: flex;
+        flex-direction: column;
+        min-height: 100svh
+    }
+    #auth .auth-visual {
+        display: flex;
+        width: 100%;
+        flex: 0 0 auto;
+        min-height: clamp(190px, 30svh, 270px);
+        height: auto;
+        padding: 18px 24px;
+        background-position: center 54%
+    }
+    #auth .auth-story {
+        max-width: 520px
+    }
+    #auth .auth-story h1 {
+        font-size: clamp(1.55rem, 6vw, 2.45rem);
+        line-height: 1.02
+    }
+    #auth .auth-story p {
+        max-width: 390px;
+        margin: 8px 0;
+        font-size: .8rem;
+        line-height: 1.5
+    }
+    #auth .auth-content {
+        width: 100%;
+        flex-basis: 100%
+    }
 }
 
 @media(prefers-reduced-motion:reduce) {
@@ -7133,7 +8300,9 @@ html[data-theme=dark] .landing-page {
     }
 }
 
+
 /* Clear, centered landing navigation with a sliding active-link surface. */
+
 .landing-nav {
     gap: clamp(14px, 2.4vw, 32px);
     padding: 10px clamp(18px, 3vw, 34px);
@@ -7244,7 +8413,6 @@ html[data-theme=dark] .landing-page {
     .landing-hero {
         margin-top: 114px
     }
-
     .landing-nav {
         top: calc(10px + env(safe-area-inset-top));
         left: 50%;
@@ -7258,7 +8426,6 @@ html[data-theme=dark] .landing-page {
         border-radius: 17px;
         transform: translateX(-50%)
     }
-
     .landing-nav .landing-brand {
         grid-column: 1;
         grid-row: 1;
@@ -7266,16 +8433,13 @@ html[data-theme=dark] .landing-page {
         margin: 0;
         font-size: .82rem
     }
-
     .landing-nav .landing-brand>span:last-child>span {
         display: block
     }
-
     .landing-nav .landing-brand-mark {
         width: 35px;
         height: 35px
     }
-
     .landing-nav-links {
         position: relative;
         top: auto;
@@ -7296,11 +8460,9 @@ html[data-theme=dark] .landing-page {
         background: #f5f2eb;
         box-shadow: none
     }
-
     .landing-nav-links.is-open {
         background: #f5f2eb
     }
-
     .landing-nav-links a {
         flex: 1 1 0;
         padding: 9px 4px;
@@ -7308,24 +8470,20 @@ html[data-theme=dark] .landing-page {
         letter-spacing: 0;
         text-align: center
     }
-
     .landing-menu-toggle {
         display: none
     }
-
     .landing-nav-actions {
         grid-column: 2;
         grid-row: 1;
         gap: 0;
         margin: 0
     }
-
     .landing-nav .landing-nav-cta {
         min-height: 37px;
         padding: 0 13px;
         font-size: .64rem
     }
-
     .landing-nav .landing-login {
         display: inline-flex;
         align-items: center;
@@ -7335,12 +8493,10 @@ html[data-theme=dark] .landing-page {
         font-size: .64rem;
         white-space: nowrap
     }
-
     .landing-nav-actions {
         flex-wrap: nowrap;
         gap: 6px
     }
-
     .landing-hero-layout {
         padding-top: 38px
     }
@@ -7350,12 +8506,10 @@ html[data-theme=dark] .landing-page {
     .landing-nav {
         padding-inline: 8px
     }
-
     .landing-nav .landing-nav-cta {
         padding-inline: 10px;
         font-size: .6rem
     }
-
     .landing-nav-links a {
         font-size: .58rem
     }
@@ -7367,7 +8521,9 @@ html[data-theme=dark] .landing-page {
     }
 }
 
+
 /* Keep public screens on the system's light neumorphic palette. */
+
 #landing {
     --bg: #ddd9cc;
     --card: #f3f1e9;
@@ -7607,7 +8763,7 @@ body {
     border-top: 1px solid color-mix(in srgb, var(--mut) 22%, transparent);
 }
 
-body:has(#app:not(.hidden)) > .site-legal,
+body:has(#app:not(.hidden))>.site-legal,
 body:has(#app:not(.hidden)) #landing .site-legal,
 body:has(#app:not(.hidden)) #cookie-banner,
 body:has(#app:not(.hidden))::after {
@@ -7628,11 +8784,9 @@ body:has(#app:not(.hidden))::after {
     .shell {
         grid-template-columns: 1fr;
     }
-
     .wrap {
         padding-bottom: calc(92px + env(safe-area-inset-bottom));
     }
-
     .side,
     .side-collapsed .side {
         position: fixed;
@@ -7648,14 +8802,12 @@ body:has(#app:not(.hidden))::after {
         overflow: hidden;
         border-radius: 18px 18px 0 0;
     }
-
     .sidebrand,
     .side-toggle,
     .sideclock,
     .side-collapsed .sideclock {
         display: none !important;
     }
-
     .snav,
     .side-collapsed .snav {
         display: flex !important;
@@ -7666,13 +8818,11 @@ body:has(#app:not(.hidden))::after {
         overflow-y: hidden;
         gap: 0;
     }
-
     .snav a {
         flex: 0 0 66px;
         min-width: 66px;
         padding: 7px 4px;
     }
-
     #who {
         display: block;
         max-width: 28vw;
@@ -7690,7 +8840,9 @@ body:has(#app:not(.hidden))::after {
     }
 }
 
+
 /* Keep the resort's teal neumorphic treatment consistent across account and dashboard controls. */
+
 #auth .otp-brand,
 #auth .otp-panel h2 {
     color: #177f79
@@ -7924,7 +9076,9 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 }
 
 @keyframes trend-area-fade {
-    to { opacity: 1 }
+    to {
+        opacity: 1
+    }
 }
 
 .trend-value {
@@ -7955,7 +9109,9 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 }
 
 @keyframes trend-line-draw {
-    to { stroke-dashoffset: 0 }
+    to {
+        stroke-dashoffset: 0
+    }
 }
 
 @keyframes trend-point-pop {
@@ -8012,11 +9168,25 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     animation: chart-grow .75s cubic-bezier(.2, .8, .2, 1) var(--bar-delay, 0ms) both
 }
 
-.progress-row[data-status="Pending"] { --status-color: #e4ad55 }
-.progress-row[data-status="Confirmed"] { --status-color: #3e94bd }
-.progress-row[data-status="Checked-In"] { --status-color: #23aaa3 }
-.progress-row[data-status="Completed"] { --status-color: #438d68 }
-.progress-row[data-status="Cancelled"] { --status-color: #c97b73 }
+.progress-row[data-status="Pending"] {
+    --status-color: #e4ad55
+}
+
+.progress-row[data-status="Confirmed"] {
+    --status-color: #3e94bd
+}
+
+.progress-row[data-status="Checked-In"] {
+    --status-color: #23aaa3
+}
+
+.progress-row[data-status="Completed"] {
+    --status-color: #438d68
+}
+
+.progress-row[data-status="Cancelled"] {
+    --status-color: #c97b73
+}
 
 .progress-row>b {
     display: flex;
@@ -8041,7 +9211,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         transform: none;
         opacity: 1
     }
-
     .trend-line {
         stroke-dashoffset: 0
     }
@@ -8052,7 +9221,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         justify-content: flex-start;
         gap: 4px
     }
-
     .snav a {
         flex: 1 0 66px;
         min-width: 66px;
@@ -8072,16 +9240,13 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         white-space: normal;
         line-height: 1.05
     }
-
     .guest-bookings {
         padding: 16px
     }
-
     .guest-booking-table th,
     .guest-booking-table td {
         padding: 12px 10px
     }
-
     .booking-empty {
         align-items: flex-start;
         flex-direction: column
@@ -8092,96 +9257,77 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     #app.wrap {
         padding: 12px 12px calc(96px + env(safe-area-inset-bottom))
     }
-
     #main {
         gap: 12px
     }
-
     .dashboard-kpi {
         grid-column: span 6;
         min-height: 112px;
         padding: 14px
     }
-
     .admin-kpis {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px
     }
-
     .dashboard-panel,
     .dashboard-chart,
     .report-chart {
         grid-column: span 12;
         padding: 18px
     }
-
     .dashboard-chart-intro {
         align-items: flex-start;
         flex-direction: column;
         padding: 18px
     }
-
     .dashboard-chart-intro>.btn {
         width: 100%
     }
-
     .dashboard-report-grid {
         gap: 12px
     }
-
     .dashboard-room-demand .hb {
         grid-template-columns: minmax(76px, 1fr) minmax(80px, 3fr) auto;
         gap: 8px
     }
-
     .progress-row {
         grid-template-columns: minmax(78px, .9fr) minmax(76px, 1.5fr) auto;
         gap: 8px
     }
-
     .report-shell {
         padding: 16px
     }
-
     .report-toolbar {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
         width: 100%
     }
-
     .report-toolbar label {
         min-width: 0
     }
-
     .report-toolbar label select,
     .report-toolbar label input {
         width: 100%;
         min-width: 0
     }
-
     .report-exports {
         grid-column: 1 / -1;
         width: 100%
     }
-
     .report-exports .btn {
         flex: 1
     }
-
     .bars {
         min-width: 100%
     }
-
     .bars-scroll.wide .bars {
         width: max-content;
         min-width: max(560px, calc(var(--bar-count) * 28px))
     }
-
     .bars-scroll.wide .bar {
         flex: 0 0 26px
     }
-
     .bar span {
         white-space: nowrap
     }
@@ -8191,7 +9337,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     .admin-kpis {
         grid-template-columns: 1fr
     }
-
     .dashboard-kpi {
         grid-column: span 12
     }
@@ -8319,7 +9464,9 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 }
 
 @keyframes account-dialog-check-draw {
-    to { stroke-dashoffset: 0 }
+    to {
+        stroke-dashoffset: 0
+    }
 }
 
 .account-dialog-button:focus-visible {
@@ -8340,8 +9487,12 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
 }
 
 @keyframes account-dialog-fade {
-    from { opacity: 0 }
-    to { opacity: 1 }
+    from {
+        opacity: 0
+    }
+    to {
+        opacity: 1
+    }
 }
 
 @media(max-width:480px) {
@@ -8349,12 +9500,10 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         padding: 28px 20px;
         border-radius: 24px
     }
-
     .account-dialog-actions {
         width: 100%;
         gap: 10px
     }
-
     .account-dialog-button {
         padding: 10px 12px
     }
@@ -8364,7 +9513,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     #auth .authbox {
         min-height: 100svh
     }
-
     #auth .auth-content {
         min-height: 0;
         padding: 24px clamp(20px, 6vw, 36px) 32px
@@ -8378,12 +9526,10 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         animation: none;
         transition: none
     }
-
     .account-dialog-icon.success svg path {
         stroke-dashoffset: 0
     }
 }
-
 
 #lb.rb {
     box-shadow: 4px 4px 9px var(--sd)
@@ -8400,23 +9546,19 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         min-width: 0;
         padding: 14px
     }
-
     .report-grid>.stat .ico {
         width: 40px;
         height: 40px;
         flex: 0 0 40px
     }
-
     .report-grid>.stat>div:last-child {
         min-width: 0
     }
-
     .report-grid>.stat small {
         display: block;
         line-height: 1.35;
         overflow-wrap: anywhere
     }
-
     .report-grid>.stat .big {
         font-size: clamp(1.2rem, 4.5vw, 1.6rem);
         line-height: 1.15;
@@ -8432,23 +9574,19 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         min-width: 0;
         padding: 8px 10px
     }
-
     #app .top .grow,
     #app .top #who {
         display: none !important
     }
-
     #app .top .logo {
         min-width: 0;
         font-size: clamp(.95rem, 4.2vw, 1.12rem);
         white-space: nowrap
     }
-
     #app .top .rb {
         width: 34px;
         height: 34px
     }
-
     #app .top .rb svg {
         width: 16px;
         height: 16px
@@ -8460,31 +9598,25 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         padding-right: 8px;
         padding-left: 8px
     }
-
     #app .top {
         grid-template-columns: minmax(0, 1fr) repeat(5, 28px);
         gap: 4px;
         padding: 8px
     }
-
     #app .top .logo {
         font-size: 1rem
     }
-
     #app .top .rb {
         width: 28px;
         height: 28px
     }
-
     #app .top .rb svg {
         width: 15px;
         height: 15px
     }
-
     .report-shell {
         padding: 12px
     }
-
     .report-grid>.stat {
         grid-column: span 12;
         min-height: 82px
@@ -8496,27 +9628,22 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         gap: 6px;
         padding-inline: 8px
     }
-
     .landing-nav .landing-brand {
         gap: 6px;
         font-size: .72rem
     }
-
     .landing-nav .landing-brand-mark {
         width: 29px;
         height: 29px
     }
-
     .landing-nav-actions {
         gap: 4px
     }
-
     .landing-nav .landing-login {
         min-height: 33px;
         padding-inline: 7px;
         font-size: .58rem
     }
-
     .landing-nav .landing-nav-cta {
         min-height: 33px;
         padding-inline: 7px;
@@ -8531,51 +9658,42 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     #auth .auth-heading {
         min-width: 0
     }
-
     #auth .auth-visual {
         min-height: clamp(172px, 26svh, 210px);
         padding: 16px clamp(18px, 5vw, 24px)
     }
-
     #auth .auth-story {
         min-width: 0
     }
-
     #auth .auth-story h1 {
         font-size: clamp(1.35rem, 6.2vw, 1.8rem);
         line-height: 1.12;
         overflow-wrap: anywhere
     }
-
     #auth .auth-story p {
         font-size: .77rem;
         line-height: 1.5;
         overflow-wrap: anywhere
     }
-
     #auth .auth-content {
         align-items: stretch;
         padding: 58px clamp(18px, 6vw, 24px) 28px
     }
-
     #auth .auth-main {
         width: 100%;
         max-width: 470px;
         gap: 14px;
         margin: 0 auto
     }
-
     #auth .auth-heading h2 {
         font-size: clamp(1.55rem, 7vw, 2rem);
         line-height: 1.15;
         overflow-wrap: anywhere
     }
-
     #auth .auth-heading .mut {
         line-height: 1.5;
         overflow-wrap: anywhere
     }
-
     #auth .auth-kicker {
         display: block;
         font-size: .58rem;
@@ -8583,12 +9701,10 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         letter-spacing: .1em;
         overflow-wrap: anywhere
     }
-
     #auth .tabs {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr))
     }
-
     #auth .tabs a {
         display: flex;
         align-items: center;
@@ -8597,13 +9713,11 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         min-height: 40px;
         line-height: 1.25
     }
-
     #auth #fr {
         grid-template-columns: minmax(0, 1fr);
         gap: 10px;
         min-width: 0
     }
-
     #auth #fr>input,
     #auth .auth-main>input,
     #auth .auth-password-control {
@@ -8611,19 +9725,16 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         max-width: 100%;
         min-width: 0
     }
-
     #auth .registration-consent {
         grid-template-columns: 20px minmax(0, 1fr);
         gap: 8px;
         font-size: .78rem;
         line-height: 1.5
     }
-
     #auth .registration-consent span {
         min-width: 0;
         overflow-wrap: anywhere
     }
-
     #auth .auth-back {
         top: 10px;
         right: 12px;
@@ -8635,7 +9746,9 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     }
 }
 
+
 /* Keep the auth return action in the form flow so it never covers the heading. */
+
 #auth .auth-main .auth-back {
     position: static;
     align-self: flex-start;
@@ -8649,7 +9762,7 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     border: 1px solid color-mix(in srgb, var(--mut) 10%, transparent);
 }
 
-.report-heading > div:first-child {
+.report-heading>div:first-child {
     min-width: 0;
 }
 
@@ -8692,28 +9805,28 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     line-height: 1.55;
 }
 
-.review > b {
+.review>b {
     min-width: 0;
     overflow-wrap: anywhere;
 }
 
-.review > .stars {
+.review>.stars {
     float: none;
     white-space: nowrap;
 }
 
-.review > p,
-.review > small,
-.review > .row {
+.review>p,
+.review>small,
+.review>.row {
     grid-column: 1 / -1;
 }
 
-.review > p {
+.review>p {
     margin: 0;
     overflow-wrap: anywhere;
 }
 
-.review > .row {
+.review>.row {
     align-items: center;
     margin: 4px 0 0;
 }
@@ -8722,51 +9835,42 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     .report-shell {
         padding: clamp(14px, 4vw, 20px);
     }
-
     .report-heading {
         gap: 16px;
         padding-bottom: 16px;
         margin-bottom: 16px;
     }
-
     .report-toolbar {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
         width: 100%;
     }
-
     .report-toolbar label {
         min-width: 0;
     }
-
     .report-toolbar select,
     .report-toolbar input {
         width: 100%;
         min-width: 0;
     }
-
-    .report-toolbar > .btn {
+    .report-toolbar>.btn {
         align-self: end;
         width: 100%;
         min-height: 40px;
     }
-
     .report-exports {
         grid-column: 1 / -1;
         width: 100%;
         gap: 10px;
     }
-
     .report-exports .btn {
         min-height: 40px;
         flex: 1 1 0;
     }
-
     #auth .auth-content {
         padding: 24px clamp(18px, 6vw, 28px) 32px;
     }
-
     #auth .auth-main .auth-back {
         top: auto;
         right: auto;
@@ -8780,20 +9884,17 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     .report-toolbar {
         grid-template-columns: minmax(0, 1fr);
     }
-
-    .report-toolbar > .btn,
+    .report-toolbar>.btn,
     .report-exports {
         grid-column: 1;
     }
-
     .review {
         grid-template-columns: minmax(0, 1fr);
     }
-
-    .review > .stars,
-    .review > p,
-    .review > small,
-    .review > .row {
+    .review>.stars,
+    .review>p,
+    .review>small,
+    .review>.row {
         grid-column: 1;
     }
 }
@@ -8804,19 +9905,16 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         flex-direction: column;
         gap: 10px;
     }
-
     .payment-header h2,
     .payment-header select {
         width: 100%;
         min-width: 0;
     }
-
     #main .admin-table {
         display: block;
         min-width: 0;
         font-size: .88rem;
     }
-
     #main .admin-table thead {
         position: absolute;
         width: 1px;
@@ -8826,12 +9924,10 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         clip-path: inset(50%);
         white-space: nowrap;
     }
-
     #main .admin-table tbody {
         display: grid;
         gap: 12px;
     }
-
     #main .admin-table tbody tr {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
@@ -8841,7 +9937,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         background: var(--card);
         box-shadow: 5px 5px 12px var(--sd), -4px -4px 12px var(--sl);
     }
-
     #main .admin-table td {
         display: grid;
         grid-template-columns: minmax(104px, .7fr) minmax(0, 1.3fr);
@@ -8851,7 +9946,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         padding: 10px 0;
         overflow-wrap: anywhere;
     }
-
     #main .admin-table td::before {
         content: attr(data-label);
         color: var(--mut);
@@ -8859,57 +9953,46 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         font-weight: 650;
         line-height: 1.4;
     }
-
     #main .admin-table td.acts {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
     }
-
     #main .admin-table td.acts::before {
         flex: 1 0 100%;
     }
-
     #main .admin-table td[colspan] {
         display: block;
         line-height: 1.5;
     }
-
     #main .admin-table td[colspan]::before {
         content: none;
     }
-
     .availability-page {
         padding: clamp(14px, 4vw, 20px);
     }
-
     .availability-page .inventory-heading {
         align-items: stretch;
         gap: 14px;
     }
-
     .availability-page .calnav {
         width: 100%;
         justify-content: center;
     }
-
     .availability-page .calnav input {
         width: min(100%, 180px);
         min-width: 110px !important;
         flex: 0 1 180px;
     }
-
     .availability-summary {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
     }
-
     .modal {
         align-items: center;
         padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
     }
-
     .modal .mbox {
         width: min(100%, 440px);
         max-height: calc(100dvh - 24px);
@@ -8925,7 +10008,6 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         gap: 6px;
         font-size: .83rem;
     }
-
     #main .admin-table td::before {
         font-size: .72rem;
     }
@@ -8936,12 +10018,10 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         align-items: flex-start;
         gap: 22px;
     }
-
-    .report-heading > div:first-child {
+    .report-heading>div:first-child {
         flex: 1 1 100%;
         max-width: none;
     }
-
     .report-toolbar {
         display: grid;
         grid-template-columns: minmax(130px, 145px) minmax(120px, 140px) minmax(130px, 140px) max-content max-content;
@@ -8951,26 +10031,21 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         width: 100%;
         margin-top: 2px;
     }
-
     .report-toolbar label {
         min-width: 0;
     }
-
     .report-toolbar select,
     .report-toolbar input {
         width: 100%;
         min-width: 0;
     }
-
-    .report-toolbar > .btn {
+    .report-toolbar>.btn {
         width: 100%;
     }
-
     .report-exports {
         width: auto;
         padding-left: 12px;
     }
-
     .report-exports .btn {
         flex: 1 1 0;
     }
@@ -8980,12 +10055,10 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
     .report-heading {
         align-items: flex-start;
     }
-
-    .report-heading > div:first-child {
+    .report-heading>div:first-child {
         flex: 1 1 100%;
         max-width: none;
     }
-
     .report-toolbar {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -8994,27 +10067,22 @@ html[data-theme=dark] #auth #otpPanel .otp-back {
         gap: 12px;
         width: 100%;
     }
-
     .report-toolbar label {
         min-width: 0;
     }
-
     .report-toolbar select,
     .report-toolbar input {
         width: 100%;
         min-width: 0;
     }
-
-    .report-toolbar > .btn {
+    .report-toolbar>.btn {
         width: 100%;
     }
-
     .report-exports {
         grid-column: 2 / 4;
         width: 100%;
         padding-left: 12px;
     }
-
     .report-exports .btn {
         flex: 1 1 0;
     }

@@ -31,3 +31,24 @@ function savePhoto($id,$d){
  q("UPDATE accommodations SET photo=? WHERE room_id=?",[$stored,$id]);return null;
 }
 function loginAs($id){$u=q("SELECT user_id,full_name,user_role FROM users WHERE user_id=?",[$id])->fetch();session_regenerate_id(true);$_SESSION['u']=$u;out(['user'=>$u]);}
+function housekeepingNotify($uid,$title,$message,$roomId=null,$taskId=null){
+ q("INSERT INTO notifications(user_id,title,message,notification_type,reservation_id,room_id,housekeeping_task_id) VALUES(?,?,?,?,NULL,?,?)",[$uid,$title,$message,'housekeeping',$roomId,$taskId]);
+}
+function housekeepingLog($action,$description,$roomId=null,$taskId=null){
+ $u=$_SESSION['u']??null;
+ q("INSERT INTO housekeeping_activity_logs(user_id,housekeeping_task_id,room_id,action,description) VALUES(?,?,?,?,?)",[$u['user_id']??null,$taskId,$roomId,$action,clean($description,500)]);
+}
+function housekeepingCreateTask($roomId,$reservationId=null,$category='Post-Checkout Cleaning',$description='Clean the room after guest checkout.',$priority='Normal',$assignedStaffId=null,$expected=null){
+ $existing=q("SELECT id FROM housekeeping_tasks WHERE room_id=? AND status NOT IN ('Approved','Rejected','Cancelled') ORDER BY id DESC LIMIT 1",[$roomId])->fetchColumn();
+ if($existing)return (int)$existing;
+ $u=$_SESSION['u']??null;
+ $code='HK-'.strtoupper(bin2hex(random_bytes(4)));
+ q("INSERT INTO housekeeping_tasks(task_code,room_id,assigned_staff_id,created_by,reservation_id,task_category,description,priority,status,assigned_at,expected_completion_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)",[
+  $code,$roomId,$assignedStaffId,$u['user_id']??null,$reservationId,$category,$description,$priority,$assignedStaffId?'Assigned':'Pending',$assignedStaffId?date('Y-m-d H:i:s'):null,$expected
+ ]);
+ $taskId=(int)(\App\Models\ResortData::connection()->lastInsertId());
+ q("UPDATE accommodations SET operational_status='Dirty',is_available=0 WHERE room_id=?",[$roomId]);
+ housekeepingLog('Task created','Automatic housekeeping task '.$code.' was created for checkout.',$roomId,$taskId);
+ if($assignedStaffId)housekeepingNotify($assignedStaffId,'Housekeeping task assigned','A '.$category.' task was assigned to you.',$roomId,$taskId);
+ return $taskId;
+}

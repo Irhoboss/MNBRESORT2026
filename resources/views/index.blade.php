@@ -239,14 +239,28 @@
     <div id="app" class="wrap hidden">
         <header class="n top">
             <div class="logo">MNB<span>Resort</span></div>
-            <div class="grow"></div><span id="who" class="chip"></span><button class="rb" id="nb" onclick="go('notifications')" title="Notifications"></button>
-            <button class="rb" id="tb" onclick="theme()" title="Dark mode"></button><button class="rb" id="mb"
-                onclick="go('msg')" title="Messages"></button><button class="rb" id="pb" onclick="go('profile')"
+            <div class="grow"></div><button class="rb" id="nb" onclick="toggleNotificationPopover()" title="Notifications" aria-expanded="false"></button>
+            <button class="rb" id="tb" onclick="theme()" title="Dark mode"></button><button class="rb" id="pb" onclick="go('profile')"
                 title="Profile"></button><button class="rb" id="lb" onclick="logout()" title="Log out"></button>
         </header>
         <div class="shell">
             <aside id="side" class="side n"></aside>
             <main id="main" class="g"></main>
+        </div>
+        <div id="notificationPopover" class="notification-popover" hidden aria-live="polite"></div>
+        <div id="chatWidget" class="chat-widget" aria-live="polite">
+            <section id="chatWidgetPanel" class="chat-widget-panel" hidden>
+                <header class="chat-widget-header">
+                    <div><span class="chat-widget-eyebrow">MESSAGES</span><b id="chatWidgetTitle">MNB Resort</b></div>
+                    <div class="chat-widget-actions"><button type="button" class="chat-widget-expand" onclick="toggleChatWidget(false);go('msg')" title="Open Messages" aria-label="Open Messages page"><?= '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"/></svg>' ?></button><button type="button" class="chat-widget-close" onclick="toggleChatWidget(false)" title="Close" aria-label="Close chat">×</button></div>
+                </header>
+                <div id="chatWidgetThreads" class="chat-widget-threads"></div>
+                <div id="chatWidgetMessages" class="chat-widget-messages"></div>
+                <div class="chat-widget-compose"><input id="chatWidgetInput" maxlength="1000" placeholder="Type a message" onkeydown="event.key==='Enter'&&sendChatWidgetMessage()"><button type="button" onclick="sendChatWidgetMessage()" aria-label="Send message"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></div>
+            </section>
+            <button id="chatWidgetLauncher" class="chat-widget-launcher" type="button" onclick="toggleChatWidget()" title="Open messages" aria-label="Open messages">
+                <span aria-hidden="true"><?= '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>' ?></span><em id="chatWidgetUnread" hidden></em>
+            </button>
         </div>
         <footer class="app-footer">
             <span>© {{ date('Y') }} MNB Resort. All rights reserved.</span>
@@ -261,8 +275,8 @@
         <a class="cookie-policy-link" href="{{ route('cookie-policy') }}">Read our cookie policy <span aria-hidden="true">→</span></a>
         <div class="cookie-actions"><button type="button" id="cookie-essential">Continue with essential cookies</button></div>
     </section>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="app.js?v={{ filemtime(public_path('app.js')) }}"></script>
 </body>
 

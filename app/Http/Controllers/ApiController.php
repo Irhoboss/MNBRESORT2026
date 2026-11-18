@@ -51,7 +51,7 @@ case 'me':
  $nn=(int)q("SELECT COUNT(*) FROM notifications WHERE user_id=? AND is_read=0",[$u['user_id']])->fetchColumn();out(['user'=>$u,'unread'=>(int)$n,'notif_unread'=>$nn]);
 case 'avail':
  $ci=$_GET['ci']??'';$co=$_GET['co']??'';if(!dt($ci)||!dt($co)||$co<=$ci)out(['error'=>'Invalid dates'],422);
- $rs=q("SELECT * FROM accommodations WHERE is_available=1 AND is_archived=0 ORDER BY rate_per_night")->fetchAll();
+ $rs=q("SELECT * FROM accommodations WHERE is_available=1 AND is_archived=0 AND operational_status='Available' ORDER BY rate_per_night")->fetchAll();
  foreach($rs as &$r){$r['free']=free($r['room_id'],$ci,$co);$r['is_favorite']=($_SESSION['u']['user_role']??'')=='Guest'?(int)q("SELECT COUNT(*) FROM favorites WHERE user_id=? AND room_id=?",[$_SESSION['u']['user_id'],$r['room_id']])->fetchColumn():0;}
  out($rs);
 case 'rooms': need('Staff','Admin');$arch=(int)($_GET['arch']??0);out(q("SELECT * FROM accommodations WHERE is_archived=? ORDER BY room_id",[$arch])->fetchAll());
@@ -72,7 +72,7 @@ case 'reserve':
  $u=need('Guest');$room=(int)($in['room']??0);$ci=$in['ci']??'';$co=$in['co']??'';$g=(int)($in['guests']??0);
  if(!dt($ci)||!dt($co)||$co<=$ci||$ci<date('Y-m-d'))out(['error'=>'Invalid dates'],422);
  $pdo->beginTransaction();
- $r=q("SELECT * FROM accommodations WHERE room_id=? AND is_available=1 AND is_archived=0 FOR UPDATE",[$room])->fetch();
+ $r=q("SELECT * FROM accommodations WHERE room_id=? AND is_available=1 AND is_archived=0 AND operational_status='Available' FOR UPDATE",[$room])->fetch();
  if(!$r||$g<1||$g>$r['capacity']){$pdo->rollBack();out(['error'=>'Room not available for that many guests'],422);}
  if(!free($room,$ci,$co)){$pdo->rollBack();out(['error'=>'Sorry, that room was just booked for those dates'],409);}
  q("INSERT INTO reservations(guest_id,room_id,check_in_date,check_out_date,guest_count) VALUES(?,?,?,?,?)",[$u['user_id'],$room,$ci,$co,$g]);$rid=$pdo->lastInsertId();$pdo->commit();audit('Booking requested',"Booking #$rid · Guest #{$u['user_id']}");notify($u['user_id'],'Booking request received',"Your booking request #$rid is pending resort confirmation.",'booking',$rid);out(['ok'=>1]);
@@ -92,12 +92,16 @@ case 'list':
 case 'setstatus':
  need('Staff','Admin');$id=(int)$in['id'];$st=$in['st']??'';
  $ok=['Confirmed'=>['Pending'],'Cancelled'=>['Pending','Confirmed'],'Checked-In'=>['Confirmed'],'Completed'=>['Checked-In']];
- $r=q("SELECT status,guest_id,payment_status,qr_code_hash FROM reservations WHERE reservation_id=?",[$id])->fetch();
+ $r=q("SELECT status,guest_id,payment_status,qr_code_hash,room_id FROM reservations WHERE reservation_id=?",[$id])->fetch();
  if(!$r||!isset($ok[$st])||!in_array($r['status'],$ok[$st]))out(['error'=>'Action not allowed for current status'],422);
+ if($st=='Completed')$pdo->beginTransaction();
  if($st=='Confirmed')q("UPDATE reservations SET status=?,qr_code_hash=COALESCE(qr_code_hash,?) WHERE reservation_id=?",[$st,bin2hex(random_bytes(32)),$id]);
  elseif($st=='Checked-In')q("UPDATE reservations SET status=?,qr_code_hash=COALESCE(qr_code_hash,?) WHERE reservation_id=?",[$st,bin2hex(random_bytes(32)),$id]);
  else q("UPDATE reservations SET status=?,qr_code_hash=NULL WHERE reservation_id=?",[$st,$id]);
+ if($st=='Checked-In')q("UPDATE accommodations SET operational_status='Occupied',is_available=0 WHERE room_id=?",[$r['room_id']]);
+ if($st=='Completed')housekeepingCreateTask((int)$r['room_id'],$id);
  audit('Booking '.$st,"Booking #$id");notify($r['guest_id'],'Booking '.$st,"Your booking #$id is now $st.",'booking',$id);
+ if($st=='Completed')$pdo->commit();
  out(['ok'=>1]);
 case 'scan':
  need('Staff','Admin');
@@ -113,24 +117,107 @@ case 'checkqr':
  $r=q("SELECT r.*,u.full_name,u.phone,a.room_name,DATEDIFF(r.check_out_date,r.check_in_date)*a.rate_per_night total FROM reservations r JOIN users u ON u.user_id=r.guest_id JOIN accommodations a ON a.room_id=r.room_id WHERE qr_code_hash=? FOR UPDATE",[$code])->fetch();
  if(!$r||!in_array($r['status'],['Confirmed','Checked-In'],true)){$pdo->rollBack();out(['error'=>'This QR was already used or has expired.'],409);}
  $next=$r['status']=='Confirmed'?'Checked-In':'Completed';$nextCode=$next=='Checked-In'?$code:null;
- q("UPDATE reservations SET status=?,qr_code_hash=? WHERE reservation_id=? AND qr_code_hash=?",[$next,$nextCode,$r['reservation_id'],$code]);$r['status']=$next;$r['qr_code_hash']=$nextCode;$pdo->commit();audit('Booking '.$next,"Booking #{$r['reservation_id']} · QR scan");notify($r['guest_id'],'Booking '.$next,"Your booking #{$r['reservation_id']} is now $next.",'booking',$r['reservation_id']);out($r);
+ q("UPDATE reservations SET status=?,qr_code_hash=? WHERE reservation_id=? AND qr_code_hash=?",[$next,$nextCode,$r['reservation_id'],$code]);
+ if($next=='Checked-In')q("UPDATE accommodations SET operational_status='Occupied',is_available=0 WHERE room_id=?",[$r['room_id']]);
+ if($next=='Completed')housekeepingCreateTask((int)$r['room_id'],$r['reservation_id']);
+ $r['status']=$next;$r['qr_code_hash']=$nextCode;$pdo->commit();
+ audit('Booking '.$next,"Booking #{$r['reservation_id']} · QR scan");notify($r['guest_id'],'Booking '.$next,"Your booking #{$r['reservation_id']} is now $next.",'booking',$r['reservation_id']);out($r);
+case 'housekeepingdashboard':
+ $u=need('Admin','Housekeeping');
+ $staffFilter=$u['user_role']=='Housekeeping'? ' AND ht.assigned_staff_id='.((int)$u['user_id']):'';
+ $tasks=q("SELECT ht.*,a.room_name,a.category room_type,u.full_name staff_name FROM housekeeping_tasks ht JOIN accommodations a ON a.room_id=ht.room_id LEFT JOIN users u ON u.user_id=ht.assigned_staff_id WHERE 1".$staffFilter." ORDER BY ht.created_at DESC LIMIT 300")->fetchAll();
+ $rooms=q("SELECT room_id,room_name,category,operational_status,maintenance_notes FROM accommodations WHERE is_archived=0 ORDER BY room_name")->fetchAll();
+ $staff=q("SELECT u.user_id,u.full_name,COUNT(ht.id) assigned_tasks,SUM(ht.status IN ('Approved','Completed')) completed_tasks,SUM(ht.status IN ('Pending','Assigned','Accepted','In Progress','Paused','Awaiting Inspection')) pending_tasks FROM users u LEFT JOIN housekeeping_tasks ht ON ht.assigned_staff_id=u.user_id WHERE u.user_role='Housekeeping' GROUP BY u.user_id,u.full_name ORDER BY u.full_name")->fetchAll();
+ $activity=q("SELECT al.*,u.full_name,a.room_name FROM housekeeping_activity_logs al LEFT JOIN users u ON u.user_id=al.user_id LEFT JOIN accommodations a ON a.room_id=al.room_id ORDER BY al.created_at DESC LIMIT 50")->fetchAll();
+ $overdue=q("SELECT COUNT(*) FROM housekeeping_tasks WHERE expected_completion_at IS NOT NULL AND expected_completion_at<NOW() AND status NOT IN ('Approved','Cancelled')")->fetchColumn();
+ out(['rooms'=>$rooms,'tasks'=>$tasks,'staff'=>$staff,'activity'=>$activity,'overdue'=>(int)$overdue,'checklist'=>q("SELECT * FROM housekeeping_checklist_items WHERE is_active=1 ORDER BY category,item_name")->fetchAll()]);
+case 'housekeepingtasks':
+ $u=need('Admin','Housekeeping');$filter=$u['user_role']=='Housekeeping'?' AND ht.assigned_staff_id='.((int)$u['user_id']):'';out(q("SELECT ht.*,a.room_name,a.category room_type,u.full_name staff_name FROM housekeeping_tasks ht JOIN accommodations a ON a.room_id=ht.room_id LEFT JOIN users u ON u.user_id=ht.assigned_staff_id WHERE 1".$filter." ORDER BY ht.created_at DESC")->fetchAll());
+case 'housekeepingstaff':
+ need('Admin');out(q("SELECT user_id,full_name,email,is_active,profile_photo FROM users WHERE user_role='Housekeeping' ORDER BY full_name")->fetchAll());
+case 'housekeepingcreate':
+ need('Admin');$room=(int)($in['room_id']??0);$staff=(int)($in['assigned_staff_id']??0);$category=clean($in['task_category']??'Regular Room Cleaning',80);$description=clean($in['description']??'',500);$priority=in_array($in['priority']??'Normal',['Low','Normal','High','Urgent'],true)?$in['priority']:'Normal';$expected=clean($in['expected_completion_at']??'',30)?:null;
+ if(!$room)out(['error'=>'Choose a room'],422);if($staff){$valid=q("SELECT 1 FROM users WHERE user_id=? AND user_role='Housekeeping' AND is_active=1",[$staff])->fetch();if(!$valid)out(['error'=>'Choose an active housekeeping staff account'],422);}
+ $existing=q("SELECT id FROM housekeeping_tasks WHERE room_id=? AND status NOT IN ('Approved','Rejected','Cancelled')",[$room])->fetchColumn();if($existing)out(['error'=>'This room already has an active housekeeping task'],409);
+ $pdo->beginTransaction();$taskId=housekeepingCreateTask($room,null,$category,$description,$priority,$staff?:null,$expected?$expected:null);$pdo->commit();out(['ok'=>1,'task_id'=>$taskId]);
+case 'housekeepingaction':
+ $u=need('Admin','Housekeeping');$id=(int)($in['task_id']??0);$action=$in['action']??'';$task=q("SELECT * FROM housekeeping_tasks WHERE id=? FOR UPDATE",[$id])->fetch();if(!$task)out(['error'=>'Task not found'],404);if($u['user_role']=='Housekeeping'&&(int)$task['assigned_staff_id']!=(int)$u['user_id'])out(['error'=>'This task is not assigned to you'],403);
+ $transitions=['Accept'=>['Assigned','Accepted'], 'Start'=>['Accepted','In Progress'], 'Pause'=>['In Progress','Paused'], 'Resume'=>['Paused','In Progress'], 'Complete'=>['In Progress','Awaiting Inspection']];
+ if(!isset($transitions[$action])&&!in_array($action,['Cancel','Reassign'],true))out(['error'=>'Unknown task action'],422);
+ if($u['user_role']=='Housekeeping'){$t=$transitions[$action]??null;if(!$t||$task['status']!=$t[0])out(['error'=>'This action is not valid for the current task status'],422);}
+ $pdo->beginTransaction();$room=(int)$task['room_id'];
+ if($action=='Accept'){q("UPDATE housekeeping_tasks SET status='Accepted',accepted_at=COALESCE(accepted_at,NOW()) WHERE id=?",[$id]);housekeepingLog('Task accepted','Housekeeping staff accepted the task.',(int)$room,$id);}
+ if($action=='Start'){q("UPDATE housekeeping_tasks SET status='In Progress',started_at=COALESCE(started_at,NOW()) WHERE id=?",[$id]);q("UPDATE accommodations SET operational_status='Cleaning',is_available=0 WHERE room_id=?",[$room]);housekeepingLog('Cleaning started','Cleaning activity started.',(int)$room,$id);}
+ if($action=='Pause'){q("UPDATE housekeeping_tasks SET status='Paused',paused_at=NOW() WHERE id=?",[$id]);housekeepingLog('Task paused','Cleaning activity paused.',(int)$room,$id);}
+ if($action=='Resume'){q("UPDATE housekeeping_tasks SET status='In Progress',resumed_at=NOW() WHERE id=?",[$id]);housekeepingLog('Cleaning resumed','Cleaning activity resumed.',(int)$room,$id);}
+ if($action=='Complete'){q("UPDATE housekeeping_tasks SET status='Awaiting Inspection',completed_at=NOW(),cleaning_notes=? WHERE id=?",[clean($in['cleaning_notes']??'',1000),$id]);q("UPDATE accommodations SET operational_status='Under Inspection',is_available=0 WHERE room_id=?",[$room]);q("INSERT IGNORE INTO housekeeping_inspections(housekeeping_task_id,room_id,inspection_result) VALUES(?,?,'Pending')",[$id,$room]);housekeepingLog('Cleaning completed','Cleaning completed and submitted for inspection.',(int)$room,$id);$admins=q("SELECT user_id FROM users WHERE user_role='Admin' AND is_active=1")->fetchAll(PDO::FETCH_COLUMN);foreach($admins as $admin)housekeepingNotify((int)$admin,'Room awaiting inspection','A cleaned room is ready for inspection.',(int)$room,$id);}
+ if($action=='Cancel'){need('Admin');q("UPDATE housekeeping_tasks SET status='Cancelled',cancellation_reason=? WHERE id=?",[clean($in['reason']??'',500),$id]);q("UPDATE accommodations SET operational_status='Dirty',is_available=0 WHERE room_id=?",[$room]);housekeepingLog('Task cancelled','Housekeeping task cancelled.',(int)$room,$id);}
+ if($action=='Reassign'){need('Admin');$staff=(int)($in['assigned_staff_id']??0);$valid=q("SELECT 1 FROM users WHERE user_id=? AND user_role='Housekeeping' AND is_active=1",[$staff])->fetch();if(!$valid){$pdo->rollBack();out(['error'=>'Choose an active housekeeping staff account'],422);}q("UPDATE housekeeping_tasks SET assigned_staff_id=?,status='Assigned',assigned_at=NOW() WHERE id=?",[$staff,$id]);housekeepingNotify($staff,'Housekeeping task reassigned','A housekeeping task was reassigned to you.',(int)$room,$id);housekeepingLog('Task reassigned','Housekeeping task reassigned.',(int)$room,$id);}
+ $pdo->commit();out(['ok'=>1]);
+case 'housekeepinginspect':
+ $u=need('Admin');$id=(int)($in['task_id']??0);$decision=$in['decision']??'';if(!in_array($decision,['Approved','Rejected'],true))out(['error'=>'Choose Approved or Rejected'],422);$task=q("SELECT * FROM housekeeping_tasks WHERE id=? FOR UPDATE",[$id])->fetch();if(!$task)out(['error'=>'Task not found'],404);if($task['status']!='Awaiting Inspection')out(['error'=>'This task is not awaiting inspection'],422);
+ $pdo->beginTransaction();$inspectionId=q("SELECT id FROM housekeeping_inspections WHERE housekeeping_task_id=?",[$id])->fetchColumn();if(!$inspectionId){q("INSERT INTO housekeeping_inspections(housekeeping_task_id,room_id,inspected_by,inspection_result,inspection_notes,rejection_reason,inspected_at) VALUES(?,?,?,?,?,?,NOW())",[$id,$task['room_id'],$u['user_id'],$decision,clean($in['inspection_notes']??'',1000),$decision=='Rejected'?clean($in['rejection_reason']??'',500):null]);$inspectionId=(int)$pdo->lastInsertId();}else q("UPDATE housekeeping_inspections SET inspected_by=?,inspection_result=?,inspection_notes=?,rejection_reason=?,inspected_at=NOW() WHERE id=?",[$u['user_id'],$decision,clean($in['inspection_notes']??'',1000),$decision=='Rejected'?clean($in['rejection_reason']??'',500):null,$inspectionId]);
+ foreach(($in['results']??[]) as $result){$item=(int)($result['item_id']??0);$pass=in_array($result['result']??'',['Passed','Failed'],true)?$result['result']:'Failed';if($item)q("INSERT INTO housekeeping_checklist_results(inspection_id,checklist_item_id,result,remarks) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE result=VALUES(result),remarks=VALUES(remarks)",[$inspectionId,$item,$pass,clean($result['remarks']??'',500)]);}
+ if($decision=='Approved'){q("UPDATE housekeeping_tasks SET status='Approved' WHERE id=?",[$id]);q("UPDATE accommodations SET operational_status='Available',is_available=1,maintenance_notes=NULL WHERE room_id=?",[$task['room_id']]);housekeepingLog('Inspection approved','Room passed inspection and is available.',(int)$task['room_id'],$id);}
+ else{$reason=clean($in['rejection_reason']??'',500);if(!$reason){$pdo->rollBack();out(['error'=>'A rejection reason is required'],422);}q("UPDATE housekeeping_tasks SET status='Rejected' WHERE id=?",[$id]);q("UPDATE accommodations SET operational_status='Dirty',is_available=0 WHERE room_id=?",[$task['room_id']]);housekeepingCreateTask((int)$task['room_id'],$task['reservation_id'],$task['task_category'],'Follow-up cleaning after rejected inspection: '.$reason,'High',(int)($task['assigned_staff_id']??0));housekeepingLog('Inspection rejected','Room returned for cleaning: '.$reason,(int)$task['room_id'],$id);if($task['assigned_staff_id'])housekeepingNotify((int)$task['assigned_staff_id'],'Inspection rejected','The room cleaning was rejected. '.$reason,(int)$task['room_id'],$id);}
+ $pdo->commit();out(['ok'=>1,'inspection_result'=>$decision]);
+case 'housekeepingreport':
+ need('Admin');$from=clean($in['from']??date('Y-m-01'),10);$to=clean($in['to']??date('Y-m-d'),10);$daily=q("SELECT DATE(created_at) report_date,COUNT(*) completed_tasks,SUM(status='Approved') approved_tasks,SUM(status='Rejected') rejected_tasks FROM housekeeping_tasks WHERE created_at BETWEEN ? AND DATE_ADD(?,INTERVAL 1 DAY) GROUP BY DATE(created_at) ORDER BY report_date",[$from,$to])->fetchAll();$staff=q("SELECT u.full_name,COUNT(ht.id) assigned_tasks,SUM(ht.status IN ('Approved','Completed')) completed_tasks,SUM(ht.expected_completion_at IS NOT NULL AND ht.expected_completion_at<NOW() AND ht.status NOT IN ('Approved','Cancelled')) overdue_tasks FROM users u LEFT JOIN housekeeping_tasks ht ON ht.assigned_staff_id=u.user_id AND ht.created_at BETWEEN ? AND DATE_ADD(?,INTERVAL 1 DAY) WHERE u.user_role='Housekeeping' GROUP BY u.user_id,u.full_name ORDER BY u.full_name",[$from,$to])->fetchAll();out(['daily'=>$daily,'staff'=>$staff]);
+case 'housekeepingmaintenance':
+ need('Admin');$room=(int)($in['room_id']??0);$action=$in['action']??'';$notes=clean($in['notes']??'',500);if(!in_array($action,['Start','Complete'],true))out(['error'=>'Choose Start or Complete'],422);$pdo->beginTransaction();if($action=='Start'){q("UPDATE accommodations SET operational_status='Under Maintenance',is_available=0,maintenance_notes=? WHERE room_id=?",[$notes,$room]);housekeepingLog('Maintenance started','Room placed under maintenance.',(int)$room,null);}else{q("UPDATE accommodations SET operational_status='Dirty',is_available=0,maintenance_notes=? WHERE room_id=?",[$notes,$room]);housekeepingCreateTask($room,null,'Deep Cleaning','Maintenance completed. Perform cleaning and inspection.','High');housekeepingLog('Maintenance completed','Maintenance completed; room returned to cleaning workflow.',(int)$room,null);}$pdo->commit();out(['ok'=>1]);
+case 'housekeepingsetstatus':
+ need('Admin');$room=(int)($in['room_id']??0);$status=$in['status']??'';$allowed=['Available','Occupied','Dirty','Cleaning','Under Inspection','Under Maintenance'];if(!$room||!in_array($status,$allowed,true))out(['error'=>'Choose a valid room status'],422);
+ $roomRow=q("SELECT * FROM accommodations WHERE room_id=? FOR UPDATE",[$room])->fetch();if(!$roomRow)out(['error'=>'Room not found'],404);
+ $pdo->beginTransaction();
+ $activeTask=q("SELECT id,status FROM housekeeping_tasks WHERE room_id=? AND status NOT IN ('Approved','Cancelled') ORDER BY id DESC LIMIT 1",[$room])->fetch();
+ if($status==='Available'){
+  if($activeTask){q("UPDATE housekeeping_tasks SET status='Cancelled',cancellation_reason='Manually set Available by administrator' WHERE id=?",[$activeTask['id']]);}
+  q("UPDATE accommodations SET operational_status='Available',is_available=1,maintenance_notes=NULL WHERE room_id=?",[$room]);
+ }elseif($status==='Occupied'){
+  q("UPDATE accommodations SET operational_status='Occupied',is_available=0 WHERE room_id=?",[$room]);
+ }elseif($status==='Dirty'){
+  q("UPDATE accommodations SET operational_status='Dirty',is_available=0 WHERE room_id=?",[$room]);
+  if(!$activeTask)housekeepingCreateTask($room,null,'Post-Checkout Cleaning','Room marked Dirty and requires post-cleaning inspection.','Normal');
+ }elseif($status==='Cleaning'){
+  q("UPDATE accommodations SET operational_status='Cleaning',is_available=0 WHERE room_id=?",[$room]);
+  if($activeTask)q("UPDATE housekeeping_tasks SET status='In Progress',started_at=COALESCE(started_at,NOW()) WHERE id=?",[$activeTask['id']]);else{$newTask=housekeepingCreateTask($room,null,'Regular Room Cleaning','Room marked for active cleaning.','Normal');q("UPDATE housekeeping_tasks SET status='In Progress',started_at=NOW() WHERE id=?",[$newTask]);}
+ }elseif($status==='Under Inspection'){
+  q("UPDATE accommodations SET operational_status='Under Inspection',is_available=0 WHERE room_id=?",[$room]);
+  if($activeTask){q("UPDATE housekeeping_tasks SET status='Awaiting Inspection',completed_at=COALESCE(completed_at,NOW()) WHERE id=?",[$activeTask['id']]);q("INSERT IGNORE INTO housekeeping_inspections(housekeeping_task_id,room_id,inspection_result) VALUES(?,?,'Pending')",[$activeTask['id'],$room]);}else{$newTask=housekeepingCreateTask($room,null,'Room Inspection','Room marked as awaiting inspection.','Normal');q("UPDATE housekeeping_tasks SET status='Awaiting Inspection',completed_at=NOW() WHERE id=?",[$newTask]);q("INSERT IGNORE INTO housekeeping_inspections(housekeeping_task_id,room_id,inspection_result) VALUES(?,?,'Pending')",[$newTask,$room]);}
+ }else{
+  q("UPDATE accommodations SET operational_status='Under Maintenance',is_available=0 WHERE room_id=?",[$room]);
+ }
+ housekeepingLog('Room status changed','Room operational status changed to '.$status.'.',(int)$room,$activeTask['id']??null);
+ $pdo->commit();out(['ok'=>1,'status'=>$status]);
 case 'stats':
  need('Staff','Admin');$t=date('Y-m-d');
  out(['pending'=>q("SELECT COUNT(*) FROM reservations WHERE status='Pending'")->fetchColumn(),'arrivals'=>q("SELECT COUNT(*) FROM reservations WHERE status='Confirmed' AND check_in_date=?",[$t])->fetchColumn(),'inhouse'=>q("SELECT COUNT(*) FROM reservations WHERE status='Checked-In'")->fetchColumn(),'rooms'=>q("SELECT COUNT(*) FROM accommodations WHERE is_available=1")->fetchColumn(),'guests'=>q("SELECT COUNT(*) FROM users WHERE user_role='Guest'")->fetchColumn()]);
 case 'threads':
- need('Staff','Admin');
- $arch=(int)($_GET['arch']??0);out(q("SELECT u.user_id,u.full_name,(SELECT message_text FROM messages WHERE thread_id=u.user_id AND is_archived=? ORDER BY message_id DESC LIMIT 1) last,(SELECT sent_at FROM messages WHERE thread_id=u.user_id AND is_archived=? ORDER BY message_id DESC LIMIT 1) last_at,(SELECT COUNT(*) FROM messages WHERE thread_id=u.user_id AND sender_id=u.user_id AND is_read=0 AND is_archived=0) unread FROM users u WHERE EXISTS(SELECT 1 FROM messages WHERE thread_id=u.user_id AND is_archived=?) ORDER BY last_at DESC",[$arch,$arch,$arch])->fetchAll());
+ $u=need();
+ $arch=(int)($_GET['arch']??0);
+ $pc=userPhotoColumn();
+ if($u['user_role']==='Guest')$roleFilter="u.user_role IN ('Staff','Admin','Housekeeping')";
+ elseif($u['user_role']==='Housekeeping')$roleFilter="u.user_role IN ('Guest','Staff','Admin')";
+ elseif($u['user_role']==='Staff')$roleFilter="u.user_role IN ('Guest','Admin','Housekeeping')";
+ else$roleFilter="u.user_role IN ('Guest','Staff','Housekeeping')";
+ $sql="SELECT u.user_id,u.full_name,u.user_role,u.`$pc` AS profile_photo,
+   (SELECT message_text FROM messages WHERE thread_id=u.user_id AND is_archived=? ORDER BY message_id DESC LIMIT 1) last,
+   (SELECT sent_at FROM messages WHERE thread_id=u.user_id AND is_archived=? ORDER BY message_id DESC LIMIT 1) last_at,
+   (SELECT COUNT(*) FROM messages WHERE thread_id=u.user_id AND sender_id<>? AND is_read=0 AND is_archived=0) unread
+   FROM users u WHERE $roleFilter ORDER BY last_at DESC,u.full_name";
+ out(q($sql,[$arch,$arch,$u['user_id']])->fetchAll());
 case 'msgs':
  $u=need();$guest=$u['user_role']=='Guest';$g=$guest?$u['user_id']:(int)($_GET['g']??0);
  $arch=(int)($_GET['arch']??0);q($guest?"UPDATE messages SET is_read=1 WHERE thread_id=? AND sender_id<>? AND is_archived=0 AND is_read=0":"UPDATE messages SET is_read=1 WHERE thread_id=? AND sender_id=? AND is_archived=0 AND is_read=0",[$g,$g]);
- $after=max(0,(int)($_GET['after']??0));$messageSql="SELECT m.*,s.full_name FROM messages m JOIN users s ON s.user_id=m.sender_id WHERE thread_id=? AND is_archived=?";$messageParams=[$g,$arch];if($after){$messageSql.=" AND message_id>?";$messageParams[]=$after;}$messageSql.=" ORDER BY message_id";
- out(['name'=>q("SELECT full_name FROM users WHERE user_id=?",[$g])->fetchColumn(),'rows'=>q($messageSql,$messageParams)->fetchAll(),'read_through'=>(int)q("SELECT COALESCE(MAX(message_id),0) FROM messages WHERE thread_id=? AND sender_id=? AND is_read=1 AND is_archived=0",[$g,$u['user_id']])->fetchColumn()]);
+ $after=max(0,(int)($_GET['after']??0));$pc=userPhotoColumn();$messageSql="SELECT m.*,s.full_name,s.user_role,s.`$pc` AS profile_photo FROM messages m JOIN users s ON s.user_id=m.sender_id WHERE thread_id=? AND is_archived=?";$messageParams=[$g,$arch];if($after){$messageSql.=" AND message_id>?";$messageParams[]=$after;}$messageSql.=" ORDER BY message_id";
+ $target=q("SELECT full_name,`$pc` AS profile_photo,user_role FROM users WHERE user_id=?",[$g])->fetch();
+ out(['name'=>$target['full_name']??'MNB Resort','profile_photo'=>$target['profile_photo']??null,'user_role'=>$target['user_role']??'','rows'=>q($messageSql,$messageParams)->fetchAll(),'read_through'=>(int)q("SELECT COALESCE(MAX(message_id),0) FROM messages WHERE thread_id=? AND sender_id=? AND is_read=1 AND is_archived=0",[$g,$u['user_id']])->fetchColumn()]);
 case 'send':
  $u=need();$g=$u['user_role']=='Guest'?$u['user_id']:(int)($in['g']??0);$t=clean($in['text']??'',1000);
  if(!$g||!$t)out(['error'=>'Empty message'],422);
  $firstGuestMessage=$u['user_role']=='Guest'&&!q("SELECT 1 FROM messages WHERE thread_id=? LIMIT 1",[$g])->fetch();
  q("INSERT INTO messages(thread_id,sender_id,message_text) VALUES(?,?,?)",[$g,$u['user_id'],$t]);
- if($firstGuestMessage){$staff=q("SELECT user_id FROM users WHERE user_role IN ('Staff','Admin') ORDER BY CASE user_role WHEN 'Staff' THEN 0 ELSE 1 END,user_id LIMIT 1")->fetchColumn();if($staff)q("INSERT INTO messages(thread_id,sender_id,message_text) VALUES(?,?,?)",[$g,$staff,'Hello and welcome to MNB Resort! How can we help you today?']);}
+ if($firstGuestMessage){$staff=q("SELECT user_id FROM users WHERE user_role IN ('Staff','Admin','Housekeeping') AND is_active=1 ORDER BY CASE user_role WHEN 'Housekeeping' THEN 0 WHEN 'Staff' THEN 1 ELSE 2 END,user_id LIMIT 1")->fetchColumn();if($staff)q("INSERT INTO messages(thread_id,sender_id,message_text) VALUES(?,?,?)",[$g,$staff,'Hello and welcome to MNB Resort! How can we help you today?']);}
  out(['ok'=>1]);
 case 'archivethread':
  need('Staff','Admin');$g=(int)($in['g']??0);$arch=empty($in['arch'])?0:1;if(!q("SELECT 1 FROM messages WHERE thread_id=? LIMIT 1",[$g])->fetch())out(['error'=>'Conversation not found'],404);q("UPDATE messages SET is_archived=? WHERE thread_id=?",[$arch,$g]);audit($arch?'Conversation archived':'Conversation restored',"Guest #$g");out(['ok'=>1]);
@@ -192,11 +279,11 @@ case 'submitpayment':
  q("INSERT INTO payments(reservation_id,amount,payment_method,transaction_type,status,proof) VALUES(?,?,?,'Payment','Pending',?)",[$rid,$amount,$method,$proof]);audit('Payment proof submitted',"Booking #$rid · ".number_format($amount,2)." · $method");out(['ok'=>1]);
 case 'users': $u=need('Admin');$pc=userPhotoColumn();out(q("SELECT u.user_id,u.username,u.first_name,u.surname,u.full_name,u.email,u.phone,u.user_role,u.is_active,u.created_at,u.`$pc` AS profile_photo,(SELECT COUNT(*) FROM reservations r WHERE r.guest_id=u.user_id) bookings,(SELECT COUNT(*) FROM reservations r WHERE r.guest_id=u.user_id AND r.status='Completed') completed,(SELECT COUNT(*) FROM reservations r WHERE r.guest_id=u.user_id AND r.status='Cancelled') cancelled,(SELECT COALESCE(SUM(p.amount),0) FROM payments p JOIN reservations r ON r.reservation_id=p.reservation_id WHERE r.guest_id=u.user_id AND p.transaction_type='Payment' AND p.status='Approved') spent FROM users u ORDER BY u.user_role,u.full_name")->fetchAll());
 case 'useractive':
- $u=need('Admin');$id=(int)($in['id']??0);$active=empty($in['active'])?0:1;if($id==$u['user_id'])out(['error'=>'You cannot deactivate your own account'],422);$changed=q("UPDATE users SET is_active=? WHERE user_id=? AND user_role='Guest'",[$active,$id]);if(!$changed->rowCount())out(['error'=>'Customer was not found or already has this status'],404);audit($active?'Customer activated':'Customer deactivated',"User #$id");out(['ok'=>1]);
+ $u=need('Admin');$id=(int)($in['id']??0);$active=empty($in['active'])?0:1;if($id==$u['user_id'])out(['error'=>'You cannot deactivate your own account'],422);$changed=q("UPDATE users SET is_active=? WHERE user_id=? AND user_role IN ('Guest','Staff','Housekeeping')",[$active,$id]);if(!$changed->rowCount())out(['error'=>'User was not found or already has this status'],404);audit($active?'Account activated':'Account deactivated',"User #$id");out(['ok'=>1]);
 case 'userdetail':
  need('Admin');$id=(int)($_GET['id']??0);$pc=userPhotoColumn();$user=q("SELECT user_id,username,first_name,surname,full_name,email,phone,address,created_at,`$pc` AS profile_photo FROM users WHERE user_id=? AND user_role='Guest'",[$id])->fetch();if(!$user)out(['error'=>'Customer not found'],404);$user['bookings']=q("SELECT r.*,a.room_name,a.rate_per_night,DATEDIFF(r.check_out_date,r.check_in_date) nights FROM reservations r JOIN accommodations a ON a.room_id=r.room_id WHERE r.guest_id=? ORDER BY r.created_at DESC",[$id])->fetchAll();$user['payments']=q("SELECT p.*,r.reservation_id FROM payments p JOIN reservations r ON r.reservation_id=p.reservation_id WHERE r.guest_id=? ORDER BY p.paid_at DESC",[$id])->fetchAll();out($user);
 case 'adduser':
- need('Admin');$e=strtolower(clean($in['email']??''));$ro=in_array($in['role']??'',['Staff','Admin'])?$in['role']:'Staff';$username=strtolower(clean($in['username']??'',32));$first=clean($in['first_name']??'',50);$surname=clean($in['surname']??'',50);$name=trim($first.' '.$surname);
+ need('Admin');$e=strtolower(clean($in['email']??''));$ro=in_array($in['role']??'',['Staff','Admin','Housekeeping'])?$in['role']:'Staff';$username=strtolower(clean($in['username']??'',32));$first=clean($in['first_name']??'',50);$surname=clean($in['surname']??'',50);$name=trim($first.' '.$surname);
  if(!preg_match('/^[a-z0-9._-]{3,32}$/',$username)||!$first||!$surname||mb_strlen($name)>100||!filter_var($e,FILTER_VALIDATE_EMAIL)||strlen($in['password']??'')<6)out(['error'=>'Enter a valid username, first name, surname, email, and password (6+ characters)'],422);
  if(q("SELECT 1 FROM users WHERE username=?",[$username])->fetch())out(['error'=>'Username already in use'],422);if(q("SELECT 1 FROM users WHERE email=?",[$e])->fetch())out(['error'=>'Email already in use'],422);
  q("INSERT INTO users(username,first_name,surname,full_name,email,phone,user_role,password_hash) VALUES(?,?,?,?,?,?,?,?)",[$username,$first,$surname,$name,$e,clean($in['phone']??'',20),$ro,password_hash($in['password'],PASSWORD_DEFAULT)]);$safe=htmlspecialchars($name,ENT_QUOTES,'UTF-8');sendEmail($e,'Welcome to MNB Resort','<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:28px;color:#20243a"><h2>Welcome to MNB Resort, '.$safe.'!</h2><p>Your '.$ro.' account has been created successfully by the resort administrator.</p><p>Please log in using the credentials provided by your administrator.</p></div>');audit('Staff account created',"$ro · $e");out(['ok'=>1]);
@@ -208,9 +295,7 @@ case 'profilephoto':
  $u=need();$d=$in['photo']??'';
  if(!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#',$d,$m))out(['error'=>'Choose a valid JPEG, PNG, or WebP photo'],422);
  $b=base64_decode($m[2],true);if(!$b||strlen($b)>3e6||!getimagesizefromstring($b))out(['error'=>'Photo must be a valid image under 3 MB'],422);
- @mkdir(public_path('uploads'),0755,true);$ext=$m[1]=='jpeg'?'jpg':$m[1];$f='uploads/profile'.$u['user_id'].'_'.time().'.'.$ext;
- if(file_put_contents(public_path($f),$b)===false)out(['error'=>'Could not save profile photo. Make sure public/uploads is writable.'],500);
- $pc=userPhotoColumn();q("UPDATE users SET `$pc`=? WHERE user_id=?",[$f,$u['user_id']]);out(['photo'=>$f]);
+ $pc=userPhotoColumn();q("UPDATE users SET `$pc`=? WHERE user_id=?",[$d,$u['user_id']]);out(['photo'=>$d]);
 case 'profile':
  $u=need();$n=clean($in['name']??'');$e=strtolower(clean($in['email']??''));
  if(!$n||!filter_var($e,FILTER_VALIDATE_EMAIL))out(['error'=>'Valid name and email required'],422);
